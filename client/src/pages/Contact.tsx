@@ -62,7 +62,7 @@ const Contact = () => {
         {
             icon: Clock,
             title: 'Working Hours',
-            content: 'Mon-Fri: 9AM - 6PM IST',
+            content: 'Mon-Fri: 9AM - 7PM IST',
             link: null
         }
     ];
