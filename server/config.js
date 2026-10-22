@@ -3,7 +3,7 @@ dotenv.config();
 
 
 const config = {
-    PORT : process.env.PORT || 5000,
+    PORT : process.env.PORT || 5001,
     CLIENT_ORIGIN : process.env.CLIENT_ORIGIN || "http://localhost:5173",
     MONGODB_URI : process.env.MONGODB_URI || "mongodb://localhost:27017/uniboard",
     JWT : {
