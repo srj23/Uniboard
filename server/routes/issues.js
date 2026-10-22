@@ -82,15 +82,15 @@ router.get('/', verifyToken, async (req, res) => {
     }
 });
 
-// CREATE issue (Admin or Manager only can assign & create)
+// CREATE issue (Admin only can create and assign)
 router.post('/', verifyToken, async (req, res) => {
     try {
         const currentUser = await User.findById(req.user.id);
         if (!currentUser) return res.status(404).json("User not found");
 
-        // Admin & Manager have full rights to create & assign
-        if (currentUser.role !== 'admin' && currentUser.role !== 'manager') {
-            return res.status(403).json("Only admins and managers can create issues.");
+        // Admin has full rights to create & assign
+        if (currentUser.role !== 'admin') {
+            return res.status(403).json("Only admins can create and assign issues.");
         }
 
         const newIssue = new Issue({
@@ -99,7 +99,7 @@ router.post('/', verifyToken, async (req, res) => {
         });
         const savedIssue = await newIssue.save();
 
-        // Admin / Manager gains attendance for delegating / assigning issue!
+        // Admin gains attendance for delegating / assigning issue
         currentUser.attendanceCount = (currentUser.attendanceCount || 0) + 1;
         currentUser.attendanceLogs.push({
             reason: `Assigned issue ${savedIssue.issueCode}: "${savedIssue.title}"`,
@@ -127,6 +127,11 @@ router.put('/:id', verifyToken, async (req, res) => {
 
         const issue = await Issue.findById(req.params.id);
         if (!issue) return res.status(404).json("Issue not found");
+
+        // If user is 'others', they have no access to issues
+        if (currentUser.role === 'others') {
+            return res.status(403).json("Users with 'others' role only have access to whiteboards.");
+        }
 
         // Role-based permissions:
         // Team member can only change status to "in_progress" or "resolved" on their assigned issues
@@ -175,7 +180,7 @@ router.put('/:id', verifyToken, async (req, res) => {
             return res.status(200).json({ issue: updated, attendanceAwarded });
         }
 
-        // Admin & Manager have full rights to modify anything
+        // Admin has full rights to modify anything
         let attendanceAwarded = false;
         if (req.body.status === 'resolved' && issue.status !== 'resolved') {
             req.body.resolvedAt = new Date();
@@ -200,12 +205,12 @@ router.put('/:id', verifyToken, async (req, res) => {
     }
 });
 
-// DELETE issue (Admin or Manager only)
+// DELETE issue (Admin only)
 router.delete('/:id', verifyToken, async (req, res) => {
     try {
         const currentUser = await User.findById(req.user.id);
-        if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'manager')) {
-            return res.status(403).json("Only admins and managers can delete issues.");
+        if (!currentUser || currentUser.role !== 'admin') {
+            return res.status(403).json("Only admins can delete issues.");
         }
 
         await Issue.findByIdAndDelete(req.params.id);

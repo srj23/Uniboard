@@ -45,12 +45,12 @@ router.get('/:id', verifyToken, async (req, res) => {
     }
 });
 
-// CREATE project (Admin or Manager only)
+// CREATE project (Admin only)
 router.post('/', verifyToken, async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
-        if (!user || (user.role !== 'admin' && user.role !== 'manager')) {
-            return res.status(403).json("Only admins and managers can create projects.");
+        if (!user || user.role !== 'admin') {
+            return res.status(403).json("Only admins can create projects.");
         }
 
         const newProject = new Project({
@@ -65,12 +65,12 @@ router.post('/', verifyToken, async (req, res) => {
     }
 });
 
-// UPDATE project (Admin or Manager only)
+// UPDATE project (Admin only)
 router.put('/:id', verifyToken, async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
-        if (!user || (user.role !== 'admin' && user.role !== 'manager')) {
-            return res.status(403).json("Only admins and managers can edit projects.");
+        if (!user || user.role !== 'admin') {
+            return res.status(403).json("Only admins can edit projects.");
         }
 
         const updatedProject = await Project.findByIdAndUpdate(
@@ -84,12 +84,12 @@ router.put('/:id', verifyToken, async (req, res) => {
     }
 });
 
-// DELETE project (Admin or Manager only)
+// DELETE project (Admin only)
 router.delete('/:id', verifyToken, async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
-        if (!user || (user.role !== 'admin' && user.role !== 'manager')) {
-            return res.status(403).json("Only admins and managers can delete projects.");
+        if (!user || user.role !== 'admin') {
+            return res.status(403).json("Only admins can delete projects.");
         }
 
         await Project.findByIdAndDelete(req.params.id);

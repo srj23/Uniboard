@@ -48,8 +48,8 @@ const Issues = ({ currentUser }: IssuesProps) => {
     const [newAssignedTo, setNewAssignedTo] = useState('');
     const [newDueDate, setNewDueDate] = useState('');
 
-    const userRole = currentUser?.role || 'teammember';
-    const canCreateAndAssign = userRole === 'admin' || userRole === 'manager';
+    const userRole = currentUser?.role || 'others';
+    const canCreateAndAssign = userRole === 'admin';
 
     const fetchIssues = async () => {
         try {
@@ -119,7 +119,7 @@ const Issues = ({ currentUser }: IssuesProps) => {
         }
     };
 
-    // Update Issue status (Team member can resolve or in_progress; Manager/Admin can set any)
+    // Update Issue status (Team member can resolve or in_progress; Admin can set any)
     const handleStatusChange = async (issueId: string, newStatus: string) => {
         try {
             const res = await api.put(`/api/issues/${issueId}`, { status: newStatus });

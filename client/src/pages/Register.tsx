@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { User, Mail, Lock, ArrowRight } from 'lucide-react';
 
 const Register = () => {
-    const [info, setInfo] = useState({ username: "", email: "", password: "", role: "teammember" });
+    const [info, setInfo] = useState({ username: "", email: "", password: "", role: "others" });
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -89,16 +89,16 @@ const Register = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-foreground ml-1">Select Role</label>
+                                <label className="text-sm font-medium text-foreground ml-1">Account Role</label>
                                 <select
                                     id="role"
                                     value={info.role}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2.5 bg-secondary/50 border border-transparent focus:border-primary focus:bg-background rounded-xl outline-none transition-all text-sm"
+                                    className="w-full px-4 py-2.5 bg-secondary/50 border border-transparent focus:border-primary focus:bg-background rounded-xl outline-none transition-all text-sm font-medium"
                                 >
-                                    <option value="teammember">Team Member (Resolves assigned issues)</option>
-                                    <option value="manager">Manager (Assigns & manages issues)</option>
-                                    <option value="admin">Admin (Full access)</option>
+                                    <option value="others">Others (Whiteboard only access)</option>
+                                    <option value="teammember">Team Member (Whiteboard + Resolve & In-Progress Issues)</option>
+                                    <option value="admin">Admin (Full Powers: Assign issues, manage team & roles)</option>
                                 </select>
                             </div>
 

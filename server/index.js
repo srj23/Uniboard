@@ -37,6 +37,7 @@ const iconRoute = require('./routes/icons');
 const projectRoute = require('./routes/projects');
 const issueRoute = require('./routes/issues');
 const performanceRoute = require('./routes/performance');
+const adminRoute = require('./routes/admin');
 
 app.use('/api/auth', authRoute);
 app.use('/api/boards', boardRoute);
@@ -46,6 +47,7 @@ app.use('/api/icons', iconRoute);
 app.use('/api/projects', projectRoute);
 app.use('/api/issues', issueRoute);
 app.use('/api/performance', performanceRoute);
+app.use('/api/admin', adminRoute);
 
 mongoose.connect(config.MONGODB_URI)
     .then(() => console.log('MongoDB connected'))

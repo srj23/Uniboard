@@ -16,10 +16,16 @@ import {
 import Projects from './Projects';
 import Issues from './Issues';
 import MyPerformance from './MyPerformance';
+import AdminPanel from './AdminPanel';
 
 const Dashboard = () => {
     const { user } = useContext(AuthContext);
-    const [activeSection, setActiveSection] = useState<'dashboard' | 'projects' | 'issues' | 'performance' | 'whiteboards'>('dashboard');
+    const userRole = user?.role || 'others';
+
+    // If 'others', default to whiteboards
+    const [activeSection, setActiveSection] = useState<'dashboard' | 'projects' | 'issues' | 'performance' | 'whiteboards' | 'admin'>(
+        userRole === 'others' ? 'whiteboards' : 'dashboard'
+    );
 
     const [metrics, setMetrics] = useState({
         open: 0,
@@ -70,46 +76,6 @@ const Dashboard = () => {
             <div className="border-b border-border bg-card/60 backdrop-blur-md sticky top-16 z-30">
                 <div className="container mx-auto px-4 flex items-center gap-1 sm:gap-4 overflow-x-auto py-2">
                     <button
-                        onClick={() => setActiveSection('dashboard')}
-                        className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap ${
-                            activeSection === 'dashboard' 
-                                ? 'bg-primary text-primary-foreground shadow-sm' 
-                                : 'text-muted-foreground hover:text-foreground'
-                        }`}
-                    >
-                        Dashboard
-                    </button>
-                    <button
-                        onClick={() => setActiveSection('projects')}
-                        className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap ${
-                            activeSection === 'projects' 
-                                ? 'bg-primary text-primary-foreground shadow-sm' 
-                                : 'text-muted-foreground hover:text-foreground'
-                        }`}
-                    >
-                        Projects
-                    </button>
-                    <button
-                        onClick={() => setActiveSection('issues')}
-                        className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap ${
-                            activeSection === 'issues' 
-                                ? 'bg-primary text-primary-foreground shadow-sm' 
-                                : 'text-muted-foreground hover:text-foreground'
-                        }`}
-                    >
-                        Issues
-                    </button>
-                    <button
-                        onClick={() => setActiveSection('performance')}
-                        className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap ${
-                            activeSection === 'performance' 
-                                ? 'bg-primary text-primary-foreground shadow-sm' 
-                                : 'text-muted-foreground hover:text-foreground'
-                        }`}
-                    >
-                        My Performance
-                    </button>
-                    <button
                         onClick={() => setActiveSection('whiteboards')}
                         className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
                             activeSection === 'whiteboards' 
@@ -120,11 +86,70 @@ const Dashboard = () => {
                         <Layers className="w-3.5 h-3.5" />
                         Whiteboards
                     </button>
+
+                    {userRole !== 'others' && (
+                        <>
+                            <button
+                                onClick={() => setActiveSection('dashboard')}
+                                className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap ${
+                                    activeSection === 'dashboard' 
+                                        ? 'bg-primary text-primary-foreground shadow-sm' 
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
+                            >
+                                Dashboard
+                            </button>
+                            <button
+                                onClick={() => setActiveSection('projects')}
+                                className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap ${
+                                    activeSection === 'projects' 
+                                        ? 'bg-primary text-primary-foreground shadow-sm' 
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
+                            >
+                                Projects
+                            </button>
+                            <button
+                                onClick={() => setActiveSection('issues')}
+                                className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap ${
+                                    activeSection === 'issues' 
+                                        ? 'bg-primary text-primary-foreground shadow-sm' 
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
+                            >
+                                Issues
+                            </button>
+                            <button
+                                onClick={() => setActiveSection('performance')}
+                                className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap ${
+                                    activeSection === 'performance' 
+                                        ? 'bg-primary text-primary-foreground shadow-sm' 
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
+                            >
+                                My Performance
+                            </button>
+                        </>
+                    )}
+
+                    {userRole === 'admin' && (
+                        <button
+                            onClick={() => setActiveSection('admin')}
+                            className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                                activeSection === 'admin' 
+                                    ? 'bg-purple-600 text-white shadow-sm' 
+                                    : 'text-purple-500 hover:text-purple-600'
+                            }`}
+                        >
+                            Admin Settings
+                        </button>
+                    )}
                 </div>
             </div>
 
             <div className="container mx-auto px-4 pt-8">
-                {activeSection === 'projects' && <Projects userRole={user?.role} />}
+                {activeSection === 'admin' && <AdminPanel />}
+                {activeSection === 'projects' && <Projects userRole={userRole} />}
                 {activeSection === 'issues' && <Issues currentUser={user} />}
                 {activeSection === 'performance' && <MyPerformance />}
                 

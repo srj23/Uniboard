@@ -10,8 +10,8 @@ const userSchema = new mongoose.Schema({
     location: { type: String, default: '' },
     role: { 
         type: String, 
-        enum: ['admin', 'manager', 'teammember'], 
-        default: 'teammember' 
+        enum: ['admin', 'teammember', 'others'], 
+        default: 'others' 
     },
     attendanceCount: { type: Number, default: 0 },
     attendanceLogs: [{

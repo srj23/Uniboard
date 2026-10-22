@@ -6,7 +6,7 @@ interface User {
     displayName?: string;
     email: string;
     token: string;
-    role?: 'admin' | 'manager' | 'teammember';
+    role?: 'admin' | 'teammember' | 'others';
     avatar?: string;
     attendanceCount?: number;
 }

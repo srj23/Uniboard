@@ -25,7 +25,7 @@ const Projects = ({ userRole }: ProjectsProps) => {
     const [newDescription, setNewDescription] = useState('');
     const [newStatus, setNewStatus] = useState<'active' | 'behind' | 'at_risk'>('active');
 
-    const canCreate = userRole === 'admin' || userRole === 'manager';
+    const canCreate = userRole === 'admin';
 
     const fetchProjects = async () => {
         try {

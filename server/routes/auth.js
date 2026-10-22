@@ -16,7 +16,7 @@ router.post('/register', async (req, res) => {
             username, 
             email, 
             password: hashedPassword,
-            role: role && ['admin', 'manager', 'teammember'].includes(role) ? role : 'teammember',
+            role: role && ['admin', 'teammember', 'others'].includes(role) ? role : 'others',
             displayName: displayName || username
         });
         const savedUser = await newUser.save();
