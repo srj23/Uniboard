@@ -2,75 +2,78 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
     Check,
-    Zap,
     Crown,
     Sparkles,
     Users,
-    Cloud,
     Shield,
-    Headphones
+    KanbanSquare,
+    PenTool,
+    Award
 } from 'lucide-react';
 
 const Pricing = () => {
     const plans = [
         {
-            name: 'Hobby',
+            name: 'Free / Others',
             price: 'Free',
             priceAmount: 0,
-            description: 'Perfect for personal projects and learning',
-            icon: Zap,
+            description: 'Pure creative whiteboard access for individuals & guests',
+            icon: PenTool,
             gradient: 'from-blue-400 to-cyan-400',
             features: [
-                '10 boards',
-                'Export to PNG',
-                'Community support',
-                'Basic collaboration'
+                'Unlimited collaborative whiteboards',
+                'Real-time multi-user drawing & canvas sync',
+                'Full shape & sticky note library',
+                'Instant PNG & SVG canvas export',
+                'View & join shared public boards',
+                'Community support'
             ],
-            cta: 'Get Started',
+            cta: 'Get Started Free',
             popular: false
         },
         {
-            name: 'Pro',
+            name: 'Pro Workspace',
             price: '₹79',
             priceAmount: 79,
-            description: 'For professionals and growing teams',
+            description: 'Complete IssueFlow, Role Governance & Attendance Tracking suite',
             icon: Crown,
-            gradient: 'from-purple-400 to-pink-400',
+            gradient: 'from-purple-400 to-pink-500',
             features: [
-                '100 boards',
-                'Export to PNG, SVG, JSON',
-                'Priority support',
-                'Real-time collaboration',
-                'Custom templates',
-                'Version history',
-                'Team workspace',
-                'Advanced permissions'
+                'Everything in Free Whiteboard',
+                'Full IssueFlow Task Management suite',
+                'Role Governance (Admin & Team Member permissions)',
+                'Automated Attendance & Performance credit ledger',
+                'Admin Control Panel: Assign tasks & grant permissions',
+                'Team Member issue workflow (In Progress & Resolved)',
+                'Priority sprints & live KPI project health metrics',
+                'Resolution duration & on-time delivery analytics',
+                'Priority email & developer support'
             ],
-            cta: 'Upgrade to Pro',
+            cta: 'Upgrade to Pro Workspace',
             popular: true
         }
     ];
 
     const additionalFeatures = [
         {
-            icon: Users,
-            title: 'Team Collaboration',
-            description: 'Work together in real-time with your team members'
+            icon: KanbanSquare,
+            title: 'IssueFlow Engine',
+            description: 'Transform whiteboard brainstorming directly into trackable sprint issues and bug tickets.'
         },
         {
-            icon: Cloud,
-            title: 'Cloud Storage',
-            description: 'All your boards safely stored in the cloud'
+            icon: Award,
+            title: 'Verified Attendance Ledger',
+            description: 'Automated attendance points granted upon resolving tickets and delegating deliverables.'
+        },
+        {
+            icon: Users,
+            title: 'Multi-Role Team Permissions',
+            description: 'Structured workflows ensuring Admins govern and Team Members execute with clarity.'
         },
         {
             icon: Shield,
-            title: 'Secure & Private',
-            description: 'Enterprise-grade security for your data'
-        },
-        {
-            icon: Headphones,
-            title: '24/7 Support',
-            description: 'Get help whenever you need it'
+            title: 'Enterprise-Grade Security',
+            description: 'Secure JWT role tokens and cloud data backups on MongoDB Atlas.'
         }
     ];
 
@@ -89,109 +92,113 @@ const Pricing = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center mb-16"
                 >
-                    <div className="inline-flex items-center px-3 py-1 rounded-full border border-border bg-secondary/50 backdrop-blur-sm text-sm text-muted-foreground mb-6">
+                    <div className="inline-flex items-center px-4 py-1.5 rounded-full border border-border bg-secondary/50 backdrop-blur-sm text-xs sm:text-sm text-muted-foreground mb-6">
                         <Sparkles className="w-4 h-4 mr-2 text-yellow-400" />
-                        Simple, transparent pricing
+                        Transparent, predictable pricing
                     </div>
-                    <h1 className="text-5xl md:text-6xl font-bold mb-6">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 tracking-tight">
                         Choose Your{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-                            Perfect Plan
+                        <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-500 bg-clip-text text-transparent">
+                            Uniboard Plan
                         </span>
                     </h1>
-                    <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                        Start for free and upgrade as you grow. No hidden fees, cancel anytime.
+                    <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                        Enjoy free collaborative whiteboards forever, or unlock the full IssueFlow task management and attendance tracking engine for just ₹79/month.
                     </p>
                 </motion.div>
 
                 {/* Pricing Cards */}
-                <div className="grid md:grid-cols-2 gap-8 mb-16 max-w-5xl mx-auto">
+                <div className="grid md:grid-cols-2 gap-8 mb-20 max-w-5xl mx-auto">
                     {plans.map((plan, index) => (
                         <motion.div
                             key={plan.name}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1 }}
-                            className={`relative rounded-3xl p-8 border transition-all duration-300 hover:scale-105 ${plan.popular
-                                    ? 'bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/50 shadow-xl shadow-purple-500/20'
+                            className={`relative rounded-3xl p-6 sm:p-8 border transition-all duration-300 flex flex-col justify-between ${
+                                plan.popular
+                                    ? 'bg-gradient-to-br from-purple-500/10 via-card to-pink-500/10 border-purple-500/50 shadow-xl shadow-purple-500/15'
                                     : 'bg-card border-border hover:border-primary/50'
-                                }`}
+                            }`}
                         >
                             {plan.popular && (
-                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold rounded-full">
-                                    Most Popular
+                                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold rounded-full uppercase tracking-wider shadow-md">
+                                    Full Team Power
                                 </div>
                             )}
 
-                            <div className="mb-6">
-                                <div className={`inline-flex p-3 rounded-2xl bg-gradient-to-br ${plan.gradient} mb-4`}>
-                                    <plan.icon className="w-8 h-8 text-white" />
+                            <div>
+                                <div className="mb-6">
+                                    <div className={`inline-flex p-3 rounded-2xl bg-gradient-to-br ${plan.gradient} mb-4`}>
+                                        <plan.icon className="w-7 h-7 text-white" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold mb-1.5">{plan.name}</h3>
+                                    <p className="text-muted-foreground text-xs sm:text-sm">{plan.description}</p>
                                 </div>
-                                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                                <p className="text-muted-foreground text-sm">{plan.description}</p>
-                            </div>
 
-                            <div className="mb-6">
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-5xl font-bold">{plan.price}</span>
-                                    {plan.priceAmount > 0 && (
-                                        <span className="text-muted-foreground">/month</span>
-                                    )}
+                                <div className="mb-6 pb-6 border-b border-border">
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-4xl sm:text-5xl font-extrabold">{plan.price}</span>
+                                        {plan.priceAmount > 0 && (
+                                            <span className="text-muted-foreground text-sm font-medium">/month</span>
+                                        )}
+                                    </div>
+                                    <span className="text-xs text-muted-foreground block mt-1">
+                                        {plan.priceAmount === 0 ? 'No credit card required' : 'Billed monthly • Cancel anytime'}
+                                    </span>
+                                </div>
+
+                                <div className="space-y-3 mb-8">
+                                    {plan.features.map((feature, idx) => (
+                                        <div key={idx} className="flex items-start gap-3">
+                                            <div className={`p-1 rounded-full bg-gradient-to-br ${plan.gradient} mt-0.5 flex-shrink-0`}>
+                                                <Check className="w-3 h-3 text-white" />
+                                            </div>
+                                            <span className="text-xs sm:text-sm text-foreground/90">{feature}</span>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
 
                             <Link
-                                to={plan.priceAmount === 0 ? '/register' : '/register'}
-                                className={`block w-full py-3 px-6 rounded-xl font-semibold text-center transition-all mb-6 ${plan.popular
-                                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 shadow-lg hover:shadow-purple-500/50'
+                                to="/register"
+                                className={`block w-full py-3.5 px-6 rounded-2xl font-semibold text-center text-sm transition-all shadow-sm ${
+                                    plan.popular
+                                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-95 shadow-purple-500/30'
                                         : 'bg-secondary text-foreground hover:bg-secondary/80'
-                                    }`}
+                                }`}
                             >
                                 {plan.cta}
                             </Link>
-
-                            <div className="space-y-3">
-                                {plan.features.map((feature, idx) => (
-                                    <div key={idx} className="flex items-start gap-3">
-                                        <div className={`p-1 rounded-full bg-gradient-to-br ${plan.gradient} mt-0.5`}>
-                                            <Check className="w-3 h-3 text-white" />
-                                        </div>
-                                        <span className="text-sm">{feature}</span>
-                                    </div>
-                                ))}
-                            </div>
                         </motion.div>
                     ))}
                 </div>
 
-                {/* Additional Features */}
+                {/* Additional Features Showcase */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="mb-16"
+                    className="mb-20"
                 >
-                    <h2 className="text-3xl font-bold text-center mb-12">
-                        Everything you need to{' '}
+                    <h2 className="text-2xl sm:text-3xl font-extrabold text-center mb-12">
+                        Everything Built Into The{' '}
                         <span className="bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-                            create amazing boards
+                            Pro Workspace
                         </span>
                     </h2>
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {additionalFeatures.map((feature, index) => (
-                            <motion.div
+                            <div
                                 key={index}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.4 + index * 0.1 }}
-                                className="p-6 rounded-2xl bg-card border border-border hover:border-primary/50 transition-colors"
+                                className="p-6 rounded-2xl bg-card border border-border hover:border-primary/50 transition-colors shadow-sm"
                             >
-                                <div className="p-3 rounded-xl bg-gradient-to-br from-blue-400 to-purple-600 w-fit mb-4">
-                                    <feature.icon className="w-6 h-6 text-white" />
+                                <div className="p-3 rounded-xl bg-primary/10 text-primary w-fit mb-4">
+                                    <feature.icon className="w-6 h-6" />
                                 </div>
-                                <h3 className="font-semibold mb-2">{feature.title}</h3>
-                                <p className="text-sm text-muted-foreground">{feature.description}</p>
-                            </motion.div>
+                                <h3 className="font-semibold text-base mb-1.5">{feature.title}</h3>
+                                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                            </div>
                         ))}
                     </div>
                 </motion.div>
@@ -200,60 +207,60 @@ const Pricing = () => {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    className="max-w-3xl mx-auto"
+                    transition={{ delay: 0.4 }}
+                    className="max-w-3xl mx-auto mb-20"
                 >
-                    <h2 className="text-3xl font-bold text-center mb-12">
+                    <h2 className="text-2xl sm:text-3xl font-extrabold text-center mb-12">
                         Frequently Asked Questions
                     </h2>
                     <div className="space-y-4">
                         {[
                             {
-                                q: 'Can I switch plans later?',
-                                a: 'Yes! You can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle.'
+                                q: 'What is included in the Free tier?',
+                                a: 'The Free tier gives you full access to create, edit, draw on, and export collaborative whiteboards without any cost.'
                             },
                             {
-                                q: 'What payment methods do you accept?',
-                                a: 'We accept all major credit cards, debit cards, and UPI payments for Indian customers.'
+                                q: 'What do I get with the ₹79/month Pro Workspace?',
+                                a: 'Pro unlocks the full IssueFlow management pipeline, admin and team member role permissions, task assignments, and the automated attendance/performance ledger.'
                             },
                             {
-                                q: 'Is there a refund policy?',
-                                a: 'Yes, we offer a 30-day money-back guarantee. If you\'re not satisfied, contact us for a full refund.'
+                                q: 'Can I change my role from Others to Team Member or Admin?',
+                                a: 'Yes! Admins can promote users directly from the Admin Settings Panel in their dashboard.'
                             },
                             {
-                                q: 'Can I cancel my subscription?',
-                                a: 'Absolutely. You can cancel your subscription at any time from your account settings. You\'ll retain access until the end of your billing period.'
+                                q: 'How does attendance auto-credit work?',
+                                a: 'Admins receive verified attendance credits whenever they delegate and assign tasks. Team members earn attendance credits when they mark an assigned issue as Resolved.'
                             }
                         ].map((faq, index) => (
                             <div
                                 key={index}
                                 className="p-6 rounded-2xl bg-card border border-border"
                             >
-                                <h3 className="font-semibold mb-2">{faq.q}</h3>
-                                <p className="text-sm text-muted-foreground">{faq.a}</p>
+                                <h3 className="font-semibold text-sm sm:text-base mb-2">{faq.q}</h3>
+                                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{faq.a}</p>
                             </div>
                         ))}
                     </div>
                 </motion.div>
 
-                {/* CTA Section */}
+                {/* CTA Box */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6 }}
-                    className="mt-16 p-12 rounded-3xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-border text-center"
+                    transition={{ delay: 0.5 }}
+                    className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 border border-border text-center shadow-lg"
                 >
-                    <h2 className="text-3xl font-bold mb-4">
-                        Still have questions?
+                    <h2 className="text-2xl sm:text-3xl font-extrabold mb-3">
+                        Empower Your Team Today
                     </h2>
-                    <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-                        Our team is here to help. Get in touch and we'll respond as soon as possible.
+                    <p className="text-xs sm:text-base text-muted-foreground mb-6 max-w-xl mx-auto">
+                        Get started with infinite whiteboards for free, or power up with IssueFlow & Attendance for ₹79/month.
                     </p>
                     <Link
-                        to="/contact"
-                        className="inline-flex items-center justify-center px-8 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:opacity-90 transition-opacity"
+                        to="/register"
+                        className="inline-flex items-center justify-center px-8 py-3.5 bg-primary text-primary-foreground rounded-2xl font-semibold hover:opacity-95 transition-opacity text-sm shadow-md"
                     >
-                        Contact Us
+                        Sign Up Now
                     </Link>
                 </motion.div>
             </div>

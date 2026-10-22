@@ -6,7 +6,7 @@ import { User, Mail, Lock, ArrowRight } from 'lucide-react';
 
 const Register = () => {
     const [info, setInfo] = useState({ username: "", email: "", password: "", role: "others" });
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -21,7 +21,8 @@ const Register = () => {
             await api.post("/api/auth/register", info);
             navigate("/login");
         } catch (err: any) {
-            setError(err.response?.data || "Registration failed");
+            const msg = err.response?.data?.message || err.response?.data || err.message || "Registration failed";
+            setError(typeof msg === 'string' ? msg : JSON.stringify(msg));
         } finally {
             setLoading(false);
         }
