@@ -6,6 +6,9 @@ interface User {
     displayName?: string;
     email: string;
     token: string;
+    role?: 'admin' | 'manager' | 'teammember';
+    avatar?: string;
+    attendanceCount?: number;
 }
 
 interface State {

@@ -1,381 +1,349 @@
-import { useContext, useEffect, useState } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
-import {
+import { 
+    AlertCircle, 
+    Clock, 
+    CheckCircle2, 
+    XCircle, 
+    Users, 
+    Layers, 
+    ArrowRight,
     Plus,
-    Search,
-    Layout,
-    Clock,
-    MoreVertical,
-    Star,
-    Trash2,
-    Grid,
-    List,
-    FilePlus,
-    Activity
+    Check
 } from 'lucide-react';
-import { motion } from 'framer-motion';
-import ConfirmDialog from '../components/ui/ConfirmDialog';
+import Projects from './Projects';
+import Issues from './Issues';
+import MyPerformance from './MyPerformance';
 
 const Dashboard = () => {
     const { user } = useContext(AuthContext);
-    const [boards, setBoards] = useState<any[]>([]);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-    const [activeMenu, setActiveMenu] = useState<string | null>(null);
+    const [activeSection, setActiveSection] = useState<'dashboard' | 'projects' | 'issues' | 'performance' | 'whiteboards'>('dashboard');
 
-    // State for delete confirmation dialog
-    const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; boardId: string | null }>({
-        isOpen: false,
-        boardId: null
+    const [metrics, setMetrics] = useState({
+        open: 0,
+        inProgress: 0,
+        resolved: 0,
+        closed: 0,
+        totalTeam: 0
     });
+    const [myRecentIssues, setMyRecentIssues] = useState<any[]>([]);
+    const [activeProjects, setActiveProjects] = useState<any[]>([]);
+    const [boards, setBoards] = useState<any[]>([]);
 
-    const navigate = useNavigate();
+    const fetchDashboardData = async () => {
+        try {
+            const [metricsRes, myIssuesRes, projRes, boardsRes] = await Promise.all([
+                api.get('/api/issues/metrics/summary').catch(() => ({ data: { open: 0, inProgress: 0, resolved: 0, closed: 0, totalTeam: 0 } })),
+                api.get('/api/issues?assignedTo=me').catch(() => ({ data: [] })),
+                api.get('/api/projects').catch(() => ({ data: [] })),
+                api.get('/api/boards').catch(() => ({ data: [] }))
+            ]);
 
-    useEffect(() => {
-        if (!user) {
-            navigate("/login");
-            return;
+            setMetrics(metricsRes.data);
+            setMyRecentIssues(myIssuesRes.data.slice(0, 5));
+            setActiveProjects(projRes.data.slice(0, 4));
+            setBoards(boardsRes.data || []);
+        } catch (err) {
+            console.error('Failed to load dashboard data', err);
         }
-        const fetchBoards = async () => {
-            try {
-                const res = await api.get("/api/boards");
-                setBoards(res.data);
-            } catch (err) {
-                console.error("Error fetching boards:", err);
-            }
-        };
-        fetchBoards();
-    }, [user, navigate]);
+    };
 
     useEffect(() => {
-        const handleClickOutside = () => setActiveMenu(null);
-        document.addEventListener('click', handleClickOutside);
-        return () => document.removeEventListener('click', handleClickOutside);
+        fetchDashboardData();
     }, []);
 
-    const handleCreate = async () => {
-        if (!user) {
-            alert("You must be logged in to create a board.");
-            navigate("/login");
-            return;
-        }
-
-        const title = "Untitled Board " + new Date().toLocaleTimeString();
-
+    const handleResolve = async (issueId: string) => {
         try {
-            const res = await api.post("/api/boards", { title });
-            setBoards((prev) => [res.data, ...prev]);
-            navigate(`/board/${res.data._id}`);
-        } catch (err) {
-            console.error("Error creating board:", err);
-            alert("Failed to create board.");
+            await api.put(`/api/issues/${issueId}`, { status: 'resolved' });
+            alert('Congratulations! Issue marked as Resolved. Attendance credited!');
+            fetchDashboardData();
+        } catch (err: any) {
+            alert(err.response?.data || 'Failed to update issue');
         }
-    };
-
-    const handleDeleteClick = (e: React.MouseEvent, boardId: string) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setActiveMenu(null);
-        setDeleteDialog({ isOpen: true, boardId });
-    };
-
-    const handleConfirmDelete = async () => {
-        if (!deleteDialog.boardId) return;
-
-        try {
-            await api.delete(`/api/boards/${deleteDialog.boardId}`);
-            setBoards(prev => prev.filter(b => b._id !== deleteDialog.boardId));
-        } catch (err) {
-            console.error("Failed to delete board:", err);
-            alert("Failed to delete board");
-        }
-        setDeleteDialog({ isOpen: false, boardId: null });
-    };
-
-    const filteredBoards = boards.filter(board =>
-        board.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    const container = {
-        hidden: { opacity: 0 },
-        show: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.1
-            }
-        }
-    };
-
-    const item = {
-        hidden: { opacity: 0, y: 20 },
-        show: { opacity: 1, y: 0 }
     };
 
     return (
-        <div className="min-h-screen bg-background text-foreground p-8">
-            <div className="max-w-7xl mx-auto space-y-12">
-
-                {/* Header Section */}
-                <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
-                            Welcome back, {user?.displayName || 'Creator'}
-                        </h1>
-                        <p className="text-muted-foreground mt-2 text-lg">
-                            Ready to create something amazing today?
-                        </p>
-                    </div>
+        <div className="min-h-screen bg-background text-foreground pb-20">
+            {/* Top Sub-Navigation matching Screenshot 1 & 4 */}
+            <div className="border-b border-border bg-card/60 backdrop-blur-md sticky top-16 z-30">
+                <div className="container mx-auto px-4 flex items-center gap-1 sm:gap-4 overflow-x-auto py-2">
                     <button
-                        onClick={handleCreate}
-                        className="group flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-primary/25"
+                        onClick={() => setActiveSection('dashboard')}
+                        className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap ${
+                            activeSection === 'dashboard' 
+                                ? 'bg-primary text-primary-foreground shadow-sm' 
+                                : 'text-muted-foreground hover:text-foreground'
+                        }`}
                     >
-                        <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-                        <span className="font-medium">New Board</span>
+                        Dashboard
                     </button>
-                </header>
-
-                {/* Stats & Quick Actions */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="p-6 rounded-2xl bg-card border border-border/50 shadow-sm hover:shadow-md transition-all"
+                    <button
+                        onClick={() => setActiveSection('projects')}
+                        className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap ${
+                            activeSection === 'projects' 
+                                ? 'bg-primary text-primary-foreground shadow-sm' 
+                                : 'text-muted-foreground hover:text-foreground'
+                        }`}
                     >
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-blue-500/10 rounded-xl text-blue-500">
-                                <Layout className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground font-medium">Total Boards</p>
-                                <h3 className="text-2xl font-bold">{boards.length}</h3>
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="p-6 rounded-2xl bg-card border border-border/50 shadow-sm hover:shadow-md transition-all"
+                        Projects
+                    </button>
+                    <button
+                        onClick={() => setActiveSection('issues')}
+                        className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap ${
+                            activeSection === 'issues' 
+                                ? 'bg-primary text-primary-foreground shadow-sm' 
+                                : 'text-muted-foreground hover:text-foreground'
+                        }`}
                     >
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-purple-500/10 rounded-xl text-purple-500">
-                                <Activity className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground font-medium">Recent Activity</p>
-                                <h3 className="text-2xl font-bold">Just now</h3>
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="p-6 rounded-2xl bg-card border border-border/50 shadow-sm hover:shadow-md transition-all"
+                        Issues
+                    </button>
+                    <button
+                        onClick={() => setActiveSection('performance')}
+                        className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap ${
+                            activeSection === 'performance' 
+                                ? 'bg-primary text-primary-foreground shadow-sm' 
+                                : 'text-muted-foreground hover:text-foreground'
+                        }`}
                     >
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-amber-500/10 rounded-xl text-amber-500">
-                                <Star className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground font-medium">Favorites</p>
-                                <h3 className="text-2xl font-bold">0</h3>
-                            </div>
-                        </div>
-                    </motion.div>
+                        My Performance
+                    </button>
+                    <button
+                        onClick={() => setActiveSection('whiteboards')}
+                        className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                            activeSection === 'whiteboards' 
+                                ? 'bg-primary text-primary-foreground shadow-sm' 
+                                : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                    >
+                        <Layers className="w-3.5 h-3.5" />
+                        Whiteboards
+                    </button>
                 </div>
-
-                {/* Templates Section */}
-                <section>
-                    <div className="flex items-center gap-2 mb-6">
-                        <FilePlus className="w-5 h-5 text-primary" />
-                        <h2 className="text-xl font-semibold">Start with a template</h2>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {['Blank Canvas', 'Flowchart', 'Mind Map', 'Wireframe'].map((template, i) => (
-                            <motion.div
-                                key={template}
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: 0.1 * i }}
-                                onClick={handleCreate}
-                                className="group cursor-pointer p-4 rounded-xl border border-border bg-card hover:border-primary/50 transition-all hover:-translate-y-1"
-                            >
-                                <div className={`aspect-video rounded-lg mb-3 ${i === 0 ? 'bg-gradient-to-br from-gray-800 to-gray-900' :
-                                    i === 1 ? 'bg-gradient-to-br from-blue-900/50 to-indigo-900/50' :
-                                        i === 2 ? 'bg-gradient-to-br from-emerald-900/50 to-teal-900/50' :
-                                            'bg-gradient-to-br from-purple-900/50 to-pink-900/50'
-                                    } flex items-center justify-center`}>
-                                    {i === 0 && <Plus className="w-8 h-8 text-muted-foreground group-hover:text-foreground transition-colors" />}
-                                </div>
-                                <p className="font-medium text-sm group-hover:text-primary transition-colors">{template}</p>
-                            </motion.div>
-                        ))}
-                    </div>
-                </section>
-
-                {/* Main Content */}
-                <section className="space-y-6">
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                        <h2 className="text-2xl font-bold flex items-center gap-2">
-                            <Layout className="w-6 h-6" />
-                            Your Boards
-                        </h2>
-
-                        <div className="flex items-center gap-3 w-full md:w-auto">
-                            <div className="relative flex-1 md:w-64">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                <input
-                                    type="text"
-                                    placeholder="Search boards..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 rounded-lg bg-secondary/50 border border-transparent focus:border-primary focus:bg-background transition-all outline-none"
-                                />
-                            </div>
-                            <div className="flex bg-secondary/50 rounded-lg p-1">
-                                <button
-                                    onClick={() => setViewMode('grid')}
-                                    className={`p-2 rounded-md transition-all ${viewMode === 'grid' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-                                >
-                                    <Grid className="w-4 h-4" />
-                                </button>
-                                <button
-                                    onClick={() => setViewMode('list')}
-                                    className={`p-2 rounded-md transition-all ${viewMode === 'list' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-                                >
-                                    <List className="w-4 h-4" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {filteredBoards.length === 0 ? (
-                        <div className="text-center py-20 border-2 border-dashed border-border rounded-3xl">
-                            <div className="w-16 h-16 bg-secondary/50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <Layout className="w-8 h-8 text-muted-foreground" />
-                            </div>
-                            <h3 className="text-xl font-semibold mb-2">No boards found</h3>
-                            <p className="text-muted-foreground mb-6">Create your first board to get started</p>
-                            <button
-                                onClick={handleCreate}
-                                className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
-                            >
-                                Create Board
-                            </button>
-                        </div>
-                    ) : (
-                        <motion.div
-                            variants={container}
-                            initial="hidden"
-                            animate="show"
-                            className={viewMode === 'grid'
-                                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-                                : "space-y-4"
-                            }
-                        >
-                            {filteredBoards.map((board: any, index) => (
-                                <motion.div
-                                    key={board._id}
-                                    variants={item}
-                                    onClick={() => navigate(`/board/${board._id}`)}
-                                    style={{ zIndex: activeMenu === board._id ? 50 : 1 }}
-                                    className={`group relative bg-card border border-border rounded-xl hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer ${viewMode === 'list' ? 'flex items-center p-4 gap-6' : 'flex flex-col h-full'
-                                        }`}
-                                >
-                                    {/* Thumbnail/Preview Area */}
-                                    <div className={`${viewMode === 'list' ? 'w-16 h-16 rounded-lg' : 'h-40 w-full rounded-t-xl'
-                                        } relative overflow-hidden bg-secondary/20`}>
-                                        {/* Animated Background Layer */}
-                                        <div className={`absolute inset-0 bg-gradient-to-br from-secondary to-secondary/50 group-hover:scale-105 transition-transform duration-500`}>
-                                            {/* Random decorative element */}
-                                            <div className={`absolute -bottom-4 -right-4 w-24 h-24 rounded-full blur-2xl opacity-20 ${['bg-blue-500', 'bg-purple-500', 'bg-emerald-500', 'bg-orange-500'][index % 4]
-                                                }`} />
-                                        </div>
-
-                                        {/* Overlay Content */}
-                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
-                                            <span className="text-white text-xs font-medium px-3 py-1 rounded-full bg-black/50 backdrop-blur-sm">
-                                                Open Board
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    {/* Content Area */}
-                                    <div className={`flex-1 ${viewMode === 'grid' ? 'p-5' : ''}`}>
-                                        <div className="flex justify-between items-start mb-2 relative">
-                                            <h3 className="font-semibold text-lg truncate pr-4 group-hover:text-primary transition-colors">
-                                                {board.title}
-                                            </h3>
-
-                                            <div className="relative">
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setActiveMenu(activeMenu === board._id ? null : board._id);
-                                                    }}
-                                                    className="opacity-0 group-hover:opacity-100 p-1 hover:bg-secondary rounded transition-all"
-                                                >
-                                                    <MoreVertical className="w-4 h-4 text-muted-foreground" />
-                                                </button>
-
-                                                {activeMenu === board._id && (
-                                                    <div
-                                                        className="absolute right-0 top-full mt-1 w-32 bg-popover border border-border rounded-lg shadow-xl z-20 py-1 cursor-default"
-                                                        onClick={(e) => e.stopPropagation()}
-                                                    >
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                navigate(`/board/${board._id}`);
-                                                            }}
-                                                            className="w-full text-left px-3 py-2 text-sm hover:bg-secondary flex items-center gap-2 cursor-pointer"
-                                                        >
-                                                            <Layout className="w-4 h-4" /> Open
-                                                        </button>
-                                                        <button
-                                                            onClick={(e) => handleDeleteClick(e, board._id)}
-                                                            className="w-full text-left px-3 py-2 text-sm hover:bg-red-500/10 text-red-500 flex items-center gap-2 cursor-pointer"
-                                                        >
-                                                            <Trash2 className="w-4 h-4" /> Delete
-                                                        </button>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center gap-4 text-xs text-muted-foreground mt-auto">
-                                            <div className="flex items-center gap-1">
-                                                <Clock className="w-3 h-3" />
-                                                {new Date(board.createdAt).toLocaleDateString()}
-                                            </div>
-                                            <div className="flex items-center gap-1">
-                                                <Activity className="w-3 h-3" />
-                                                Edited 2m ago
-                                            </div>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </motion.div>
-                    )}
-                </section>
             </div>
 
-            <ConfirmDialog
-                isOpen={deleteDialog.isOpen}
-                onClose={() => setDeleteDialog({ ...deleteDialog, isOpen: false })}
-                onConfirm={handleConfirmDelete}
-                title="Delete Board"
-                message="Are you sure you want to delete this board? This action cannot be undone."
-                type="danger"
-                confirmText="Delete Board"
-            />
+            <div className="container mx-auto px-4 pt-8">
+                {activeSection === 'projects' && <Projects userRole={user?.role} />}
+                {activeSection === 'issues' && <Issues currentUser={user} />}
+                {activeSection === 'performance' && <MyPerformance />}
+                
+                {/* Whiteboard Canvas Studio View */}
+                {activeSection === 'whiteboards' && (
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h2 className="text-2xl font-bold tracking-tight">Collaborative Whiteboards</h2>
+                                <p className="text-sm text-muted-foreground">Brainstorm, sketch architectures, and share real-time canvases</p>
+                            </div>
+                            <Link 
+                                to="/board/new" 
+                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-xl transition shadow-sm"
+                            >
+                                <Plus className="w-4 h-4" />
+                                Create Canvas
+                            </Link>
+                        </div>
+
+                        {boards.length === 0 ? (
+                            <div className="bg-card border border-border rounded-2xl p-12 text-center">
+                                <Layers className="w-12 h-12 mx-auto text-muted-foreground mb-3 opacity-40" />
+                                <h3 className="text-base font-semibold mb-1">No whiteboards created yet</h3>
+                                <p className="text-sm text-muted-foreground mb-4">Start a collaborative canvas to sketch out user flows and diagrams.</p>
+                                <Link 
+                                    to="/board/new"
+                                    className="px-4 py-2 bg-primary text-primary-foreground text-sm rounded-xl font-medium inline-block"
+                                >
+                                    New Canvas
+                                </Link>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {boards.map((b) => (
+                                    <Link
+                                        key={b._id}
+                                        to={`/board/${b._id}`}
+                                        className="bg-card border border-border rounded-2xl p-5 hover:border-primary/50 transition-all group"
+                                    >
+                                        <div className="aspect-video bg-secondary/50 rounded-xl mb-4 flex items-center justify-center border border-border group-hover:scale-[1.02] transition-transform">
+                                            <Layers className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors" />
+                                        </div>
+                                        <h4 className="font-semibold text-base mb-1">{b.title || 'Untitled Board'}</h4>
+                                        <span className="text-xs text-muted-foreground">Updated {new Date(b.updatedAt).toLocaleDateString()}</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Main Overview Dashboard (matching Screenshot 1) */}
+                {activeSection === 'dashboard' && (
+                    <div className="space-y-8">
+                        <div>
+                            <h1 className="text-3xl font-extrabold tracking-tight">Dashboard</h1>
+                            <p className="text-sm text-muted-foreground">Welcome back! Here's what's happening with your projects.</p>
+                        </div>
+
+                        {/* Top 5 Metric Cards matching Screenshot 1 */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                            {/* Open Issues */}
+                            <div className="bg-card border border-border rounded-2xl p-5 relative overflow-hidden shadow-sm">
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-xs font-semibold text-muted-foreground">Open Issues</span>
+                                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center">
+                                        <AlertCircle className="w-4 h-4" />
+                                    </div>
+                                </div>
+                                <div className="text-3xl font-extrabold">{metrics.open} <span className="text-xs font-normal text-muted-foreground">+0</span></div>
+                                <div className="text-[11px] text-muted-foreground mt-2">Issues + Sub-issues</div>
+                            </div>
+
+                            {/* In Progress */}
+                            <div className="bg-card border border-border rounded-2xl p-5 relative overflow-hidden shadow-sm">
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-xs font-semibold text-muted-foreground">In Progress</span>
+                                    <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center">
+                                        <Clock className="w-4 h-4" />
+                                    </div>
+                                </div>
+                                <div className="text-3xl font-extrabold">{metrics.inProgress} <span className="text-xs font-normal text-muted-foreground">+0</span></div>
+                                <div className="text-[11px] text-muted-foreground mt-2">Issues + Sub-issues</div>
+                            </div>
+
+                            {/* Resolved */}
+                            <div className="bg-card border border-border rounded-2xl p-5 relative overflow-hidden shadow-sm">
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-xs font-semibold text-muted-foreground">Resolved</span>
+                                    <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                                        <CheckCircle2 className="w-4 h-4" />
+                                    </div>
+                                </div>
+                                <div className="text-3xl font-extrabold text-emerald-500">{metrics.resolved} <span className="text-xs font-normal text-emerald-600">+9</span></div>
+                                <div className="text-[11px] text-muted-foreground mt-2">Issues + Sub-issues</div>
+                            </div>
+
+                            {/* Closed */}
+                            <div className="bg-card border border-border rounded-2xl p-5 relative overflow-hidden shadow-sm">
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-xs font-semibold text-muted-foreground">Closed</span>
+                                    <div className="w-8 h-8 rounded-xl bg-secondary text-muted-foreground flex items-center justify-center">
+                                        <XCircle className="w-4 h-4" />
+                                    </div>
+                                </div>
+                                <div className="text-3xl font-extrabold">{metrics.closed} <span className="text-xs font-normal text-muted-foreground">+0</span></div>
+                                <div className="text-[11px] text-muted-foreground mt-2">Issues + Sub-issues</div>
+                            </div>
+
+                            {/* Team Issues */}
+                            <div className="bg-card border border-border rounded-2xl p-5 relative overflow-hidden shadow-sm">
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-xs font-semibold text-muted-foreground">Team Issues</span>
+                                    <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                                        <Users className="w-4 h-4" />
+                                    </div>
+                                </div>
+                                <div className="text-3xl font-extrabold">{metrics.totalTeam}</div>
+                                <div className="text-[11px] text-muted-foreground mt-2">Workspace total</div>
+                            </div>
+                        </div>
+
+                        {/* 3-Column Split Layout matching Screenshot 1 & 2 */}
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                            {/* Left: Priority Issues (3 cols) */}
+                            <div className="lg:col-span-3 bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center text-center">
+                                <div className="w-full text-left mb-6 flex items-center gap-2 text-rose-500 font-semibold text-sm">
+                                    <AlertCircle className="w-4 h-4" />
+                                    Priority Issues
+                                </div>
+                                <div className="my-auto py-8">
+                                    <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-3 opacity-30" />
+                                    <div className="text-sm font-semibold">No priority issues at the moment</div>
+                                    <p className="text-xs text-muted-foreground mt-1">Great job staying on top of things! 🎉</p>
+                                </div>
+                            </div>
+
+                            {/* Middle: My Issues (6 cols) */}
+                            <div className="lg:col-span-6 bg-card border border-border rounded-2xl p-6 shadow-sm">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="font-bold text-base">My Issues</h3>
+                                    <button 
+                                        onClick={() => setActiveSection('issues')}
+                                        className="text-xs text-blue-500 hover:underline flex items-center gap-1 font-medium"
+                                    >
+                                        View all <ArrowRight className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+
+                                {myRecentIssues.length === 0 ? (
+                                    <div className="text-center py-12 text-muted-foreground text-xs">
+                                        No active issues assigned to you. Enjoy your clean queue!
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {myRecentIssues.map((issue) => (
+                                            <div key={issue._id} className="p-3.5 bg-secondary/40 rounded-xl border border-border hover:border-primary/40 transition-colors">
+                                                <div className="flex items-center justify-between gap-2 mb-1.5">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xs font-mono text-muted-foreground">{issue.issueCode}</span>
+                                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 font-medium capitalize">{issue.priority}</span>
+                                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-medium capitalize">{issue.status}</span>
+                                                    </div>
+                                                    {issue.status !== 'resolved' && (
+                                                        <button
+                                                            onClick={() => handleResolve(issue._id)}
+                                                            className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1"
+                                                        >
+                                                            <Check className="w-3 h-3" />
+                                                            Resolve
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                <div className="text-xs font-semibold text-foreground">{issue.title}</div>
+                                                <div className="text-[11px] text-muted-foreground mt-1 flex items-center gap-3">
+                                                    <span>{issue.project?.title || 'General'}</span>
+                                                    {issue.dueDate && <span>Due {new Date(issue.dueDate).toLocaleDateString()}</span>}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Right: Active Projects (3 cols) */}
+                            <div className="lg:col-span-3 bg-card border border-border rounded-2xl p-6 shadow-sm">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="font-bold text-base">Active Projects</h3>
+                                    <button 
+                                        onClick={() => setActiveSection('projects')}
+                                        className="text-xs text-blue-500 hover:underline flex items-center gap-1 font-medium"
+                                    >
+                                        View all <ArrowRight className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+
+                                {activeProjects.length === 0 ? (
+                                    <div className="text-center py-10 text-muted-foreground text-xs">
+                                        No active projects yet.
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {activeProjects.map((p) => (
+                                            <div key={p._id} className="p-3 bg-secondary/40 rounded-xl border border-border">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-xs font-semibold text-foreground">{p.title}</span>
+                                                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                                                </div>
+                                                <div className="text-[11px] text-muted-foreground mt-1 line-clamp-1">{p.description || 'Active project'}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

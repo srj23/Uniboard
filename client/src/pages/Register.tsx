@@ -5,12 +5,12 @@ import { motion } from 'framer-motion';
 import { User, Mail, Lock, ArrowRight } from 'lucide-react';
 
 const Register = () => {
-    const [info, setInfo] = useState({ username: "", email: "", password: "" });
+    const [info, setInfo] = useState({ username: "", email: "", password: "", role: "teammember" });
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setInfo((prev) => ({ ...prev, [e.target.id]: e.target.value }));
     };
 
@@ -86,6 +86,20 @@ const Register = () => {
                                         placeholder="••••••••"
                                     />
                                 </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-foreground ml-1">Select Role</label>
+                                <select
+                                    id="role"
+                                    value={info.role}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2.5 bg-secondary/50 border border-transparent focus:border-primary focus:bg-background rounded-xl outline-none transition-all text-sm"
+                                >
+                                    <option value="teammember">Team Member (Resolves assigned issues)</option>
+                                    <option value="manager">Manager (Assigns & manages issues)</option>
+                                    <option value="admin">Admin (Full access)</option>
+                                </select>
                             </div>
 
                             {error && (

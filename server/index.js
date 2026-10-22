@@ -34,12 +34,18 @@ const boardRoute = require('./routes/boards');
 const uploadRoute = require('./routes/upload');
 const userRoute = require('./routes/users');
 const iconRoute = require('./routes/icons');
+const projectRoute = require('./routes/projects');
+const issueRoute = require('./routes/issues');
+const performanceRoute = require('./routes/performance');
 
 app.use('/api/auth', authRoute);
 app.use('/api/boards', boardRoute);
 app.use('/api/upload', uploadRoute);
 app.use('/api/users', userRoute);
 app.use('/api/icons', iconRoute);
+app.use('/api/projects', projectRoute);
+app.use('/api/issues', issueRoute);
+app.use('/api/performance', performanceRoute);
 
 mongoose.connect(config.MONGODB_URI)
     .then(() => console.log('MongoDB connected'))

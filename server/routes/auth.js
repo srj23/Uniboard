@@ -6,17 +6,29 @@ const jwt = require('jsonwebtoken');
 // Register
 router.post('/register', async (req, res) => {
     try {
-        const { username, email, password } = req.body;
+        const { username, email, password, role, displayName } = req.body;
         // Check if user exists
         const existingUser = await User.findOne({ email });
         if (existingUser) return res.status(400).json("User already exists");
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ username, email, password: hashedPassword });
+        const newUser = new User({ 
+            username, 
+            email, 
+            password: hashedPassword,
+            role: role && ['admin', 'manager', 'teammember'].includes(role) ? role : 'teammember',
+            displayName: displayName || username
+        });
         const savedUser = await newUser.save();
 
+        const token = jwt.sign(
+            { id: savedUser._id, role: savedUser.role }, 
+            process.env.JWT_SECRET || 'secret', 
+            { expiresIn: '3d' }
+        );
+
         const { password: _, ...others } = savedUser._doc;
-        res.status(201).json(others);
+        res.status(201).json({ ...others, token });
     } catch (err) {
         res.status(500).json(err);
     }
@@ -31,7 +43,11 @@ router.post('/login', async (req, res) => {
         const validPassword = await bcrypt.compare(req.body.password, user.password);
         if (!validPassword) return res.status(400).json("Wrong password");
 
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '3d' });
+        const token = jwt.sign(
+            { id: user._id, role: user.role || 'teammember' }, 
+            process.env.JWT_SECRET || 'secret', 
+            { expiresIn: '3d' }
+        );
         const { password, ...others } = user._doc;
         res.status(200).json({ ...others, token });
     } catch (err) {

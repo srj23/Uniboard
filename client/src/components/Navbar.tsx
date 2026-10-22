@@ -65,9 +65,14 @@ const Navbar = () => {
                     {/* Logo */}
                     <Link
                         to="/"
-                        className="text-2xl font-bold text-white bg-clip-text text-transparent hover:opacity-80 transition-opacity"
+                        className="flex items-center gap-2 font-bold text-xl hover:opacity-90 transition-opacity"
                     >
-                        Uniboard
+                        <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-sm">
+                            IF
+                        </div>
+                        <span className="bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
+                            IssueFlow
+                        </span>
                     </Link>
 
                     {/* Desktop Navigation */}

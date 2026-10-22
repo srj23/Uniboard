@@ -8,6 +8,17 @@ const userSchema = new mongoose.Schema({
     bio: { type: String, default: '' },
     avatar: { type: String, default: '' },
     location: { type: String, default: '' },
+    role: { 
+        type: String, 
+        enum: ['admin', 'manager', 'teammember'], 
+        default: 'teammember' 
+    },
+    attendanceCount: { type: Number, default: 0 },
+    attendanceLogs: [{
+        date: { type: Date, default: Date.now },
+        reason: { type: String, default: '' }, // e.g. "Resolved issue #123" or "Assigned issue #123"
+        issueId: { type: mongoose.Schema.Types.ObjectId, ref: 'Issue' }
+    }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
