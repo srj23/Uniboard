@@ -4,7 +4,8 @@ import {
     Plus, 
     Search, 
     AlertCircle,
-    Check
+    Check,
+    Trash2
 } from 'lucide-react';
 
 interface IssueItem {
@@ -130,6 +131,17 @@ const Issues = ({ currentUser }: IssuesProps) => {
             fetchIssues();
         } catch (err: any) {
             alert(err.response?.data || 'Failed to update issue status');
+        }
+    };
+
+    // Delete issue permanently (Admin only)
+    const handleDeleteIssue = async (issueId: string) => {
+        if (!confirm('Are you sure you want to permanently delete this issue? This cannot be undone.')) return;
+        try {
+            await api.delete(`/api/issues/${issueId}`);
+            fetchIssues();
+        } catch (err: any) {
+            alert(err.response?.data || 'Failed to delete issue');
         }
     };
 
@@ -330,6 +342,16 @@ const Issues = ({ currentUser }: IssuesProps) => {
                                                 className="px-3 py-1.5 rounded-xl text-xs font-medium bg-secondary text-muted-foreground hover:bg-secondary/80 transition"
                                             >
                                                 Close Issue
+                                            </button>
+                                        )}
+
+                                        {canCreateAndAssign && (
+                                            <button
+                                                onClick={() => handleDeleteIssue(issue._id)}
+                                                className="p-1.5 rounded-xl text-muted-foreground hover:bg-rose-500/10 hover:text-rose-500 transition"
+                                                title="Delete issue permanently"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
                                             </button>
                                         )}
 
