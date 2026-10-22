@@ -44,8 +44,8 @@ const Contact = () => {
         {
             icon: Mail,
             title: 'Email',
-            content: 'support@uniboard.tech',
-            link: 'mailto:support@uniboard.tech'
+            content: 'riderop500@gmail.com',
+            link: 'mailto:riderop500@gmail.com'
         },
         // {
         //     icon: Phone,
