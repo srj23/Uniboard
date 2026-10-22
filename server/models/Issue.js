@@ -23,11 +23,10 @@ const issueSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Auto-generate short issue code before save
-issueSchema.pre('validate', function(next) {
+issueSchema.pre('validate', function() {
     if (!this.issueCode) {
         this.issueCode = '#' + Math.random().toString(16).substring(2, 10);
     }
-    next();
 });
 
 module.exports = mongoose.model('Issue', issueSchema);
