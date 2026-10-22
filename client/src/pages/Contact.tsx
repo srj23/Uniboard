@@ -244,54 +244,8 @@ const Contact = () => {
                                 ))}
                             </div>
                         </div>
-
-                        {/* Quick Links */}
-                        <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-border rounded-2xl p-8">
-                            <h3 className="font-semibold mb-4">Quick Links</h3>
-                            <div className="space-y-3">
-                                <a href="#" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                                    Documentation
-                                </a>
-                                <a href="#" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                                    Help Center
-                                </a>
-                                <a href="#" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                                    Community Forum
-                                </a>
-                                <a href="#" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                                    Status Page
-                                </a>
-                            </div>
-                        </div>
                     </motion.div>
                 </div>
-
-                {/* Map or Additional Info */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="mt-12 p-8 bg-card border border-border rounded-2xl text-center"
-                >
-                    <h3 className="text-xl font-bold mb-3">Looking for support?</h3>
-                    <p className="text-muted-foreground mb-4">
-                        Check out our comprehensive documentation and help center for instant answers to common questions.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <a
-                            href="#"
-                            className="px-6 py-3 bg-secondary text-foreground rounded-xl font-semibold hover:bg-secondary/80 transition-colors"
-                        >
-                            View Documentation
-                        </a>
-                        <a
-                            href="#"
-                            className="px-6 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:opacity-90 transition-opacity"
-                        >
-                            Visit Help Center
-                        </a>
-                    </div>
-                </motion.div>
             </div>
         </div>
     );
