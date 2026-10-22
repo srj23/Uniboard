@@ -68,10 +68,10 @@ const Navbar = () => {
                         className="flex items-center gap-2 font-bold text-xl hover:opacity-90 transition-opacity"
                     >
                         <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-sm">
-                            IF
+                            UB
                         </div>
                         <span className="bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
-                            IssueFlow
+                            Uniboard
                         </span>
                     </Link>
 

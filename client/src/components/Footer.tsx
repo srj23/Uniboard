@@ -10,12 +10,11 @@ const Footer = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                     {/* Brand Section */}
                     <div className="col-span-1 md:col-span-2">
-                        <Link to="/" className="text-2xl font-bold  text-white bg-clip-text text-transparent inline-block mb-4">
+                        <Link to="/" className="text-2xl font-bold text-white bg-clip-text text-transparent inline-block mb-3">
                             Uniboard
                         </Link>
-                        <p className="text-muted-foreground mb-4 max-w-md">
-                            The ultimate collaborative whiteboard for developers and designers.
-                            Create, collaborate, and bring your ideas to life.
+                        <p className="text-muted-foreground mb-4 max-w-md text-sm leading-relaxed">
+                            The all-in-one workspace unifying real-time collaborative whiteboards, automated issue flow, and transparent attendance tracking. Sketch, resolve deliverables, and measure team productivity seamlessly.
                         </p>
                         <div className="flex gap-4">
                             <a
