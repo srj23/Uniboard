@@ -115,7 +115,8 @@ router.post('/', verifyToken, async (req, res) => {
 
         res.status(201).json({ issue: populatedIssue, attendanceAwarded: true });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error("Error creating issue:", err);
+        res.status(500).json(err?.message || "Failed to create issue");
     }
 });
 

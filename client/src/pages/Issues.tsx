@@ -103,8 +103,8 @@ const Issues = ({ currentUser }: IssuesProps) => {
                 project: newProjectId,
                 priority: newPriority,
             };
-            if (newAssignedTo) payload.assignedTo = newAssignedTo;
-            if (newDueDate) payload.dueDate = newDueDate;
+            if (newAssignedTo && newAssignedTo.trim()) payload.assignedTo = newAssignedTo;
+            if (newDueDate && newDueDate.trim()) payload.dueDate = newDueDate;
 
             const res = await api.post('/api/issues', payload);
             if (res.data.attendanceAwarded) {
@@ -115,7 +115,8 @@ const Issues = ({ currentUser }: IssuesProps) => {
             setNewDescription('');
             fetchIssues();
         } catch (err: any) {
-            alert(err.response?.data || 'Failed to create issue');
+            const errorMsg = err.response?.data?.error || err.response?.data?.message || err.response?.data || err.message || 'Failed to create issue';
+            alert(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg));
         }
     };
 
