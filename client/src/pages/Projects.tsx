@@ -155,7 +155,7 @@ const Projects = ({ userRole }: ProjectsProps) => {
                                 <input
                                     type="text"
                                     required
-                                    placeholder="e.g. Academice Content"
+                                    placeholder="e.g. Core Platform Engine"
                                     value={newTitle}
                                     onChange={(e) => setNewTitle(e.target.value)}
                                     className="w-full px-3 py-2 bg-secondary/50 border border-border rounded-xl text-sm outline-none focus:border-primary"
