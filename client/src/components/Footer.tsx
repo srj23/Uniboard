@@ -49,16 +49,6 @@ const Footer = () => {
                                     Contact
                                 </Link>
                             </li>
-                            <li>
-                                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                                    Documentation
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                                    Help Center
-                                </a>
-                            </li>
                         </ul>
                     </div>
                 </div>
