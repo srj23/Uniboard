@@ -98,18 +98,18 @@ const AdminPanel = () => {
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex flex-wrap items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-0 border-border">
                                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                                             <Award className="w-4 h-4 text-emerald-500" />
                                             <span>{u.attendanceCount || 0} Attendance</span>
                                         </div>
 
                                         {isEditing ? (
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                                                 <select
                                                     value={editRole}
                                                     onChange={(e: any) => setEditRole(e.target.value)}
-                                                    className="px-3 py-1.5 bg-secondary border border-border rounded-xl text-xs outline-none font-medium"
+                                                    className="px-3 py-1.5 bg-secondary border border-border rounded-xl text-xs outline-none font-medium flex-1 sm:flex-none"
                                                 >
                                                     <option value="others">Others (Whiteboard only)</option>
                                                     <option value="teammember">Team Member</option>
