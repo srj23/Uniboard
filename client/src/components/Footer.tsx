@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Github, Twitter, Linkedin, Mail, Heart } from 'lucide-react';
+import { Heart } from 'lucide-react';
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();
@@ -16,42 +16,6 @@ const Footer = () => {
                         <p className="text-muted-foreground mb-4 max-w-md text-sm leading-relaxed">
                             The all-in-one workspace unifying real-time collaborative whiteboards, automated issue flow, and transparent attendance tracking. Sketch, resolve deliverables, and measure team productivity seamlessly.
                         </p>
-                        <div className="flex gap-4">
-                            <a
-                                href="https://github.com"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-2 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
-                                aria-label="GitHub"
-                            >
-                                <Github className="w-5 h-5" />
-                            </a>
-                            <a
-                                href="https://twitter.com"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-2 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
-                                aria-label="Twitter"
-                            >
-                                <Twitter className="w-5 h-5" />
-                            </a>
-                            <a
-                                href="https://linkedin.com"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-2 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
-                                aria-label="LinkedIn"
-                            >
-                                <Linkedin className="w-5 h-5" />
-                            </a>
-                            <a
-                                href="mailto:riderop500@gmail.com"
-                                className="p-2 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
-                                aria-label="Email"
-                            >
-                                <Mail className="w-5 h-5" />
-                            </a>
-                        </div>
                     </div>
 
                     {/* Product Links */}
