@@ -61,14 +61,11 @@ app.get('/', (req, res) => {
 io.use((socket, next) => {
     const token = socket.handshake.auth.token;
     if (token) {
-        const tokenString = token.split(" ")[1]; // Remove "Bearer "
-        jwt.verify(tokenString, process.env.JWT_SECRET || 'secret', (err, user) => {
+        const tokenString = token.startsWith('Bearer ') ? token.split(" ")[1] : token;
+        jwt.verify(tokenString, config.JWT.SECRET, (err, user) => {
             if (!err) {
                 socket.user = user;
             }
-            // We don't reject connection if token is invalid/missing, 
-            // because unauthenticated users can still view public boards.
-            // Authorization is checked per-event.
             next();
         });
     } else {

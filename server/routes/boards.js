@@ -1,13 +1,14 @@
 const router = require('express').Router();
 const Board = require('../models/Board');
 const jwt = require('jsonwebtoken');
+const config = require('../config');
 
 // Middleware to verify token
 const verifyToken = (req, res, next) => {
-    const authHeader = req.headers.token;
+    const authHeader = req.headers.token || req.headers.authorization;
     if (authHeader) {
-        const token = authHeader.split(" ")[1];
-        jwt.verify(token, process.env.JWT_SECRET || 'secret', (err, user) => {
+        const token = authHeader.startsWith('Bearer ') ? authHeader.split(" ")[1] : authHeader.split(" ")[1] || authHeader;
+        jwt.verify(token, config.JWT.SECRET, (err, user) => {
             if (err) return res.status(403).json("Token is not valid!");
             req.user = user;
             next();

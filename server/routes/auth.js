@@ -3,6 +3,8 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const config = require('../config');
+
 // Register
 router.post('/register', async (req, res) => {
     try {
@@ -23,7 +25,7 @@ router.post('/register', async (req, res) => {
 
         const token = jwt.sign(
             { id: savedUser._id, role: savedUser.role }, 
-            process.env.JWT_SECRET || 'secret', 
+            config.JWT.SECRET, 
             { expiresIn: '3d' }
         );
 
@@ -47,7 +49,7 @@ router.post('/login', async (req, res) => {
 
         const token = jwt.sign(
             { id: user._id, role: user.role || 'teammember' }, 
-            process.env.JWT_SECRET || 'secret', 
+            config.JWT.SECRET, 
             { expiresIn: '3d' }
         );
         const { password, ...others } = user._doc;

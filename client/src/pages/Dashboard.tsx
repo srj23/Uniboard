@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import api from '../utils/api';
 import { 
@@ -11,7 +11,8 @@ import {
     Layers, 
     ArrowRight,
     Plus,
-    Check
+    Check,
+    Trash2
 } from 'lucide-react';
 import Projects from './Projects';
 import Issues from './Issues';
@@ -20,6 +21,7 @@ import AdminPanel from './AdminPanel';
 
 const Dashboard = () => {
     const { user } = useContext(AuthContext);
+    const navigate = useNavigate();
     const userRole = user?.role || 'others';
 
     // If 'others', default to whiteboards
@@ -37,6 +39,33 @@ const Dashboard = () => {
     const [myRecentIssues, setMyRecentIssues] = useState<any[]>([]);
     const [activeProjects, setActiveProjects] = useState<any[]>([]);
     const [boards, setBoards] = useState<any[]>([]);
+    const [creatingBoard, setCreatingBoard] = useState(false);
+
+    const handleCreateBoard = async () => {
+        try {
+            setCreatingBoard(true);
+            const title = prompt("Enter whiteboard title:", "Untitled Board") || "Untitled Board";
+            const res = await api.post("/api/boards", { title });
+            navigate(`/board/${res.data._id}`);
+        } catch (err: any) {
+            console.error("Failed to create board", err);
+            alert(err.response?.data?.message || err.response?.data || "Failed to create whiteboard.");
+        } finally {
+            setCreatingBoard(false);
+        }
+    };
+
+    const handleDeleteBoard = async (e: React.MouseEvent, boardId: string) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!confirm("Are you sure you want to delete this board?")) return;
+        try {
+            await api.delete(`/api/boards/${boardId}`);
+            setBoards((prev) => prev.filter((b) => b._id !== boardId));
+        } catch (err: any) {
+            alert(err.response?.data || "Failed to delete board.");
+        }
+    };
 
     const fetchDashboardData = async () => {
         try {
@@ -161,13 +190,14 @@ const Dashboard = () => {
                                 <h2 className="text-2xl font-bold tracking-tight">Collaborative Whiteboards</h2>
                                 <p className="text-sm text-muted-foreground">Brainstorm, sketch architectures, and share real-time canvases</p>
                             </div>
-                            <Link 
-                                to="/board/new" 
-                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-xl transition shadow-sm"
+                            <button 
+                                onClick={handleCreateBoard}
+                                disabled={creatingBoard}
+                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-xl transition shadow-sm disabled:opacity-50"
                             >
                                 <Plus className="w-4 h-4" />
-                                Create Canvas
-                            </Link>
+                                {creatingBoard ? 'Creating...' : 'Create Canvas'}
+                            </button>
                         </div>
 
                         {boards.length === 0 ? (
@@ -175,27 +205,34 @@ const Dashboard = () => {
                                 <Layers className="w-12 h-12 mx-auto text-muted-foreground mb-3 opacity-40" />
                                 <h3 className="text-base font-semibold mb-1">No whiteboards created yet</h3>
                                 <p className="text-sm text-muted-foreground mb-4">Start a collaborative canvas to sketch out user flows and diagrams.</p>
-                                <Link 
-                                    to="/board/new"
+                                <button 
+                                    onClick={handleCreateBoard}
                                     className="px-4 py-2 bg-primary text-primary-foreground text-sm rounded-xl font-medium inline-block"
                                 >
                                     New Canvas
-                                </Link>
+                                </button>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {boards.map((b) => (
-                                    <Link
+                                    <div
                                         key={b._id}
-                                        to={`/board/${b._id}`}
-                                        className="bg-card border border-border rounded-2xl p-5 hover:border-primary/50 transition-all group"
+                                        onClick={() => navigate(`/board/${b._id}`)}
+                                        className="bg-card border border-border rounded-2xl p-5 hover:border-primary/50 transition-all group relative cursor-pointer"
                                     >
-                                        <div className="aspect-video bg-secondary/50 rounded-xl mb-4 flex items-center justify-center border border-border group-hover:scale-[1.02] transition-transform">
+                                        <div className="aspect-video bg-secondary/50 rounded-xl mb-4 flex items-center justify-center border border-border group-hover:scale-[1.02] transition-transform relative overflow-hidden">
                                             <Layers className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors" />
+                                            <button
+                                                onClick={(e) => handleDeleteBoard(e, b._id)}
+                                                className="absolute top-2 right-2 p-1.5 rounded-lg bg-background/80 hover:bg-rose-500 hover:text-white text-muted-foreground transition opacity-0 group-hover:opacity-100 shadow-sm"
+                                                title="Delete board"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
                                         </div>
                                         <h4 className="font-semibold text-base mb-1">{b.title || 'Untitled Board'}</h4>
-                                        <span className="text-xs text-muted-foreground">Updated {new Date(b.updatedAt).toLocaleDateString()}</span>
-                                    </Link>
+                                        <span className="text-xs text-muted-foreground">Updated {new Date(b.updatedAt || b.createdAt).toLocaleDateString()}</span>
+                                    </div>
                                 ))}
                             </div>
                         )}
