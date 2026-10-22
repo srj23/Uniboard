@@ -8,9 +8,9 @@ const { v4: uuidv4 } = require('uuid');
 
 // Middleware to verify token
 const verifyToken = (req, res, next) => {
-    const authHeader = req.headers.token;
+    const authHeader = req.headers.token || req.headers.authorization;
     if (authHeader) {
-        const token = authHeader.split(" ")[1];
+        const token = authHeader.startsWith('Bearer ') ? authHeader.split(" ")[1] : authHeader.split(" ")[1] || authHeader;
         jwt.verify(token, config.JWT.SECRET, (err, user) => {
             if (err) return res.status(403).json("Token is not valid!");
             req.user = user;

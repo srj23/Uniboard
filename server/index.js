@@ -12,6 +12,7 @@ const Board = require('./models/Board');
 dotenv.config();
 
 const app = express();
+app.disable('x-powered-by');
 const PORT = config.PORT;
 
 // Create HTTP server

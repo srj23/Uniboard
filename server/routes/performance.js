@@ -83,7 +83,7 @@ router.get('/my-stats', verifyToken, async (req, res) => {
 // GET all team members (useful for assignment dropdowns)
 router.get('/team', verifyToken, async (req, res) => {
     try {
-        const users = await User.find().select('username displayName avatar role email attendanceCount');
+        const users = await User.find().select('username displayName avatar role');
         res.status(200).json(users);
     } catch (err) {
         res.status(500).json({ error: err.message });
