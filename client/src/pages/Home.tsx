@@ -20,17 +20,6 @@ const Home = () => {
 
     return (
         <div className="min-h-screen bg-[#0a0a0a] text-zinc-100 selection:bg-pink-500 selection:text-black">
-            {/* Minimal Grid Header Rule */}
-            <div className="border-b border-zinc-800 bg-[#0d0d0d]/90 py-2.5 px-4 text-xs font-mono text-zinc-400 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-pink-500 inline-block animate-pulse"></span>
-                    <span>SYSTEM_STATUS: ONLINE</span>
-                </div>
-                <div className="hidden sm:block text-zinc-500">
-                    STACK: TS / NODE / MONGO / SOCKET.IO
-                </div>
-            </div>
-
             <div className="container mx-auto px-4 py-12 md:py-20 max-w-6xl">
                 {/* HERO SECTION */}
                 <div className="mb-20">
