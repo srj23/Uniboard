@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/api';
-import { motion } from 'framer-motion';
 import { User, Mail, Lock, ArrowRight } from 'lucide-react';
 
 const Register = () => {
@@ -29,114 +28,100 @@ const Register = () => {
     };
 
     return (
-        <div className="min-h-[80vh] flex items-center justify-center p-4">
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-md"
-            >
-                <div className="bg-card border border-border rounded-2xl shadow-xl overflow-hidden">
-                    <div className="p-8">
-                        <div className="text-center mb-8">
-                            <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent mb-2">
-                                Create Account
-                            </h2>
-                            <p className="text-muted-foreground">
-                                Join Uniboard and start creating today
-                            </p>
-                        </div>
-
-                        <form className="space-y-6">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-foreground ml-1">Username</label>
-                                <div className="relative group">
-                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                                    <input
-                                        type="text"
-                                        id="username"
-                                        onChange={handleChange}
-                                        className="w-full pl-10 pr-4 py-2.5 bg-secondary/50 border border-transparent focus:border-primary focus:bg-background rounded-xl outline-none transition-all"
-                                        placeholder="johndoe"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-foreground ml-1">Email</label>
-                                <div className="relative group">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                                    <input
-                                        type="email"
-                                        id="email"
-                                        onChange={handleChange}
-                                        className="w-full pl-10 pr-4 py-2.5 bg-secondary/50 border border-transparent focus:border-primary focus:bg-background rounded-xl outline-none transition-all"
-                                        placeholder="name@example.com"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-foreground ml-1">Password</label>
-                                <div className="relative group">
-                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                                    <input
-                                        type="password"
-                                        id="password"
-                                        onChange={handleChange}
-                                        className="w-full pl-10 pr-4 py-2.5 bg-secondary/50 border border-transparent focus:border-primary focus:bg-background rounded-xl outline-none transition-all"
-                                        placeholder="••••••••"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-foreground ml-1">Account Role</label>
-                                <select
-                                    id="role"
-                                    value={info.role}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-2.5 bg-secondary/50 border border-transparent focus:border-primary focus:bg-background rounded-xl outline-none transition-all text-sm font-medium"
-                                >
-                                    <option value="others">Others (Whiteboard only access)</option>
-                                    <option value="teammember">Team Member (Whiteboard + Resolve & In-Progress Issues)</option>
-                                    <option value="admin">Admin (Full Powers: Assign issues, manage team & roles)</option>
-                                </select>
-                            </div>
-
-                            {error && (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: 'auto' }}
-                                    className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm text-center"
-                                >
-                                    {String(error)}
-                                </motion.div>
-                            )}
-
-                            <button
-                                onClick={handleClick}
-                                disabled={loading}
-                                className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg hover:shadow-primary/25 flex items-center justify-center gap-2 group"
-                            >
-                                {loading ? (
-                                    "Creating Account..."
-                                ) : (
-                                    <>
-                                        Get Started <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                    </>
-                                )}
-                            </button>
-                        </form>
-                    </div>
-
-                    <div className="p-4 bg-secondary/30 border-t border-border text-center text-sm text-muted-foreground">
-                        Already have an account?{' '}
-                        <Link to="/login" className="text-primary font-medium hover:underline">
-                            Sign in
-                        </Link>
-                    </div>
+        <div className="min-h-[80vh] flex items-center justify-center p-4 bg-[#0a0a0a]">
+            <div className="w-full max-w-sm border border-zinc-800 bg-[#121212] rounded p-6 shadow-xl">
+                <div className="mb-6 pb-4 border-b border-zinc-800">
+                    <h2 className="text-xl font-bold text-white tracking-tight">
+                        Create Account
+                    </h2>
+                    <p className="text-xs text-zinc-400 mt-1">
+                        Sign up to get started with Issueflow
+                    </p>
                 </div>
-            </motion.div>
+
+                <form className="space-y-4">
+                    <div>
+                        <label className="block text-xs font-mono text-zinc-400 mb-1">Username</label>
+                        <div className="relative">
+                            <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
+                            <input
+                                type="text"
+                                id="username"
+                                onChange={handleChange}
+                                className="w-full pl-8 pr-3 py-2 bg-[#0a0a0a] border border-zinc-800 rounded text-xs font-mono text-white outline-none focus:border-pink-500"
+                                placeholder="johndoe"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-mono text-zinc-400 mb-1">Email</label>
+                        <div className="relative">
+                            <Mail className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
+                            <input
+                                type="email"
+                                id="email"
+                                onChange={handleChange}
+                                className="w-full pl-8 pr-3 py-2 bg-[#0a0a0a] border border-zinc-800 rounded text-xs font-mono text-white outline-none focus:border-pink-500"
+                                placeholder="name@example.com"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-mono text-zinc-400 mb-1">Password</label>
+                        <div className="relative">
+                            <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
+                            <input
+                                type="password"
+                                id="password"
+                                onChange={handleChange}
+                                className="w-full pl-8 pr-3 py-2 bg-[#0a0a0a] border border-zinc-800 rounded text-xs font-mono text-white outline-none focus:border-pink-500"
+                                placeholder="••••••••"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-mono text-zinc-400 mb-1">Role Permissions</label>
+                        <select
+                            id="role"
+                            value={info.role}
+                            onChange={handleChange}
+                            className="w-full px-2.5 py-2 bg-[#0a0a0a] border border-zinc-800 rounded text-xs font-mono text-zinc-300 outline-none focus:border-pink-500"
+                        >
+                            <option value="others">Viewer (Read-only)</option>
+                            <option value="teammember">Team Member (Resolve tasks)</option>
+                            <option value="admin">Admin (Create projects & assign)</option>
+                        </select>
+                    </div>
+
+                    {error && (
+                        <div className="p-2.5 rounded bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono">
+                            {String(error)}
+                        </div>
+                    )}
+
+                    <button
+                        onClick={handleClick}
+                        disabled={loading}
+                        className="w-full py-2 bg-pink-500 hover:bg-pink-400 text-black font-semibold text-xs font-mono rounded transition-colors flex items-center justify-center gap-1.5"
+                    >
+                        {loading ? "Registering..." : (
+                            <>
+                                Register Account <ArrowRight className="w-3.5 h-3.5" />
+                            </>
+                        )}
+                    </button>
+                </form>
+
+                <div className="mt-5 pt-4 border-t border-zinc-800 text-center text-xs font-mono text-zinc-500">
+                    Already registered?{' '}
+                    <Link to="/login" className="text-pink-400 hover:underline">
+                        Sign in
+                    </Link>
+                </div>
+            </div>
         </div>
     );
 };

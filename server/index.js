@@ -7,7 +7,6 @@ const path = require('path');
 const config = require('./config');
 const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
-const Board = require('./models/Board');
 
 dotenv.config();
 
@@ -31,20 +30,16 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const authRoute = require('./routes/auth');
-const boardRoute = require('./routes/boards');
 const uploadRoute = require('./routes/upload');
 const userRoute = require('./routes/users');
-const iconRoute = require('./routes/icons');
 const projectRoute = require('./routes/projects');
 const issueRoute = require('./routes/issues');
 const performanceRoute = require('./routes/performance');
 const adminRoute = require('./routes/admin');
 
 app.use('/api/auth', authRoute);
-app.use('/api/boards', boardRoute);
 app.use('/api/upload', uploadRoute);
 app.use('/api/users', userRoute);
-app.use('/api/icons', iconRoute);
 app.use('/api/projects', projectRoute);
 app.use('/api/issues', issueRoute);
 app.use('/api/performance', performanceRoute);
@@ -55,7 +50,7 @@ mongoose.connect(config.MONGODB_URI)
     .catch(err => console.error(err));
 
 app.get('/', (req, res) => {
-    res.send('Uniboard API is running');
+    res.send('Issueflow API is running');
 });
 
 // Socket.IO Middleware for Authentication
@@ -74,93 +69,24 @@ io.use((socket, next) => {
     }
 });
 
-// Socket.IO connection handling
+// Real-time updates for Issueflow
 io.on('connection', (socket) => {
-    //console.log('User connected:', socket.id, socket.user ? `(${socket.user.username})` : '(Guest)');
-
-    // Join a specific board room
-    socket.on('join-board', (boardId) => {
-        socket.join(boardId);
-        // console.log(`User ${socket.id} joined board ${boardId}`);
-
-        // Notify others in the room
-        socket.to(boardId).emit('user-joined', {
-            userId: socket.id,
-            username: socket.user ? socket.user.username : 'Guest',
-            timestamp: new Date()
-        });
+    // Join a project room for real-time issue sync
+    socket.on('join-project', (projectId) => {
+        socket.join(`project-${projectId}`);
     });
 
-    // Handle element updates
-    socket.on('element-update', async ({ boardId, elements }) => {
-        try {
-            const board = await Board.findById(boardId);
-            if (!board) return;
-
-
-            const userId = socket.user ? socket.user.id : null;
-            const isOwner = userId && board.user.toString() === userId;
-            const isEditor = userId && board.editors.some(id => id.toString() === userId);
-            const isPublicEdit = board.visibility === 'public-edit';
-
-            if (isOwner || isEditor || isPublicEdit) {
-                // Broadcast to all other users in the board (real-time)
-                socket.to(boardId).emit('elements-updated', elements);
-
-                // Save to database
-                await Board.findByIdAndUpdate(boardId, { elements });
-                // console.log(`💾 Saved board ${boardId} to database`);
-            } else {
-
-                //console.warn(`⚠️ Unauthorized update attempt on board ${boardId} by user ${userId || 'Guest'}`);
-                // Optionally emit an error back to the sender
-                socket.emit('error', { message: 'Unauthorized to edit this board' });
-            }
-        } catch (err) {
-            console.error('Error processing element-update:', err);
-        }
+    socket.on('leave-project', (projectId) => {
+        socket.leave(`project-${projectId}`);
     });
 
-    // Handle single element changes (more efficient)
-    socket.on('element-change', async ({ boardId, element, action }) => {
-        try {
-            const board = await Board.findById(boardId);
-            if (!board) return;
-
-            const userId = socket.user ? socket.user.id : null;
-            const isOwner = userId && board.user.toString() === userId;
-            const isEditor = userId && board.collaborators.some(c => c.user.toString() === userId && c.role === 'editor');
-            const isPublicEdit = board.visibility === 'public-edit';
-
-            if (isOwner || isEditor || isPublicEdit) {
-                socket.to(boardId).emit('element-changed', { element, action });
-            }
-        } catch (err) {
-            console.error('Error processing element-change:', err);
-        }
+    // Notify team members when an issue is updated or status changed
+    socket.on('issue-updated', ({ projectId, issue }) => {
+        socket.to(`project-${projectId}`).emit('issue-updated', issue);
     });
 
-    // Handle cursor movement (optional - for showing other users' cursors)
-    socket.on('cursor-move', ({ boardId, position }) => {
-        socket.to(boardId).emit('cursor-moved', {
-            userId: socket.id,
-            username: socket.user ? socket.user.username : 'Guest',
-            position
-        });
-    });
-
-    // Handle disconnection
     socket.on('disconnect', () => {
-        // console.log('User disconnected:', socket.id);
-    });
-
-    // Leave board room
-    socket.on('leave-board', (boardId) => {
-        socket.leave(boardId);
-        socket.to(boardId).emit('user-left', {
-            userId: socket.id,
-            timestamp: new Date()
-        });
+        // Disconnected
     });
 });
 

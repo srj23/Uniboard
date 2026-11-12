@@ -9,7 +9,7 @@ import {
 const MyPerformance = () => {
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'overview' | 'attendance' | 'trends'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'attendance'>('overview');
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -30,156 +30,156 @@ const MyPerformance = () => {
     const stats = data?.performance;
 
     return (
-        <div className="space-y-6">
-            {/* Header matching Screenshot 5 */}
-            <div className="bg-card border border-border rounded-2xl p-6">
+        <div className="space-y-4">
+            {/* Header */}
+            <div className="border border-zinc-800 bg-[#121212] rounded p-5">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <div className="flex items-center gap-2 mb-1">
-                            <Activity className="w-5 h-5 text-blue-500" />
-                            <h2 className="text-2xl font-bold tracking-tight">My Performance Dashboard</h2>
+                            <Activity className="w-4 h-4 text-pink-500" />
+                            <h2 className="text-xl font-bold font-mono tracking-tight text-white">Performance Ledger</h2>
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                            Track your personal productivity, quality metrics, and performance trends
+                        <p className="text-xs font-mono text-zinc-500">
+                            Verified delivery metrics & attendance points
                         </p>
                     </div>
 
-                    <div className="flex items-center gap-2 bg-secondary/50 px-3 py-1.5 rounded-xl border border-border text-xs text-muted-foreground">
-                        <Calendar className="w-4 h-4 text-primary" />
-                        <span>Today: {new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                    <div className="flex items-center gap-2 bg-[#0a0a0a] px-3 py-1.5 rounded border border-zinc-800 text-xs font-mono text-zinc-400">
+                        <Calendar className="w-3.5 h-3.5 text-pink-500" />
+                        <span>DATE: {new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                     </div>
                 </div>
 
                 {/* User Info Bar */}
-                <div className="mt-6 pt-6 border-t border-border flex items-center justify-between flex-wrap gap-4">
+                <div className="mt-5 pt-5 border-t border-zinc-800 flex items-center justify-between flex-wrap gap-4">
                     <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-sm shadow-sm">
+                        <div className="w-9 h-9 rounded bg-pink-500 text-black font-mono font-bold flex items-center justify-center text-xs">
                             {user?.displayName?.substring(0, 2).toUpperCase() || 'U'}
                         </div>
                         <div>
-                            <h4 className="font-semibold text-sm leading-none">{user?.displayName || user?.username}</h4>
-                            <span className="text-xs capitalize text-muted-foreground mt-1 inline-block">
-                                Role: <strong className="text-foreground">{user?.role || 'Team Member'}</strong>
+                            <h4 className="font-semibold text-sm font-mono text-white leading-none">{user?.displayName || user?.username}</h4>
+                            <span className="text-xs font-mono text-zinc-500 mt-1 inline-block">
+                                ROLE: <strong className="text-pink-400 font-normal">{user?.role || 'Team Member'}</strong>
                             </span>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <div className="bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-xl text-right">
-                            <div className="text-xs font-semibold text-emerald-600">Total Attendance Points</div>
-                            <div className="text-xl font-extrabold text-emerald-500 flex items-center justify-end gap-1.5">
-                                <Award className="w-5 h-5" />
-                                {user?.attendanceCount || 0} Points
+                        <div className="bg-[#0a0a0a] border border-zinc-800 px-4 py-2 rounded text-right">
+                            <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Attendance Points</div>
+                            <div className="text-lg font-bold font-mono text-pink-400 flex items-center justify-end gap-1.5">
+                                <Award className="w-4 h-4" />
+                                {user?.attendanceCount || 0} PTS
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Sub-Tabs matching Screenshot 5 */}
-            <div className="flex bg-secondary/50 p-1 rounded-xl border border-border max-w-md">
+            {/* Sub-Tabs */}
+            <div className="flex bg-[#121212] p-1 rounded border border-zinc-800 max-w-xs">
                 <button
                     onClick={() => setActiveTab('overview')}
-                    className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
-                        activeTab === 'overview' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                    className={`flex-1 py-1.5 text-xs font-mono font-medium rounded transition-colors ${
+                        activeTab === 'overview' ? 'bg-pink-500 text-black font-semibold' : 'text-zinc-400 hover:text-white'
                     }`}
                 >
                     Overview
                 </button>
                 <button
                     onClick={() => setActiveTab('attendance')}
-                    className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
-                        activeTab === 'attendance' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                    className={`flex-1 py-1.5 text-xs font-mono font-medium rounded transition-colors ${
+                        activeTab === 'attendance' ? 'bg-pink-500 text-black font-semibold' : 'text-zinc-400 hover:text-white'
                     }`}
                 >
-                    My Attendance Logs
+                    Attendance Logs
                 </button>
             </div>
 
             {loading ? (
-                <div className="py-12 text-center text-xs text-muted-foreground">Loading performance data...</div>
+                <div className="py-8 border border-zinc-800 bg-[#121212] rounded text-center text-xs font-mono text-zinc-500">Loading metrics...</div>
             ) : activeTab === 'overview' ? (
-                /* Overview 5 Metric Cards matching Screenshot 5 */
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                    <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
-                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                            Issues Resolved
+                /* Overview 5 Metric Cards */
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                    <div className="border border-zinc-800 bg-[#121212] rounded p-4">
+                        <div className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2">
+                            Resolved
                         </div>
-                        <div className="text-3xl font-extrabold tracking-tight">
+                        <div className="text-2xl font-bold font-mono text-white">
                             {stats?.issuesResolved || 0}
                         </div>
-                        <span className="text-xs text-muted-foreground mt-2 block">— out of {stats?.totalAssigned || 0} assigned</span>
+                        <span className="text-[10px] font-mono text-zinc-500 mt-2 block">of {stats?.totalAssigned || 0} total</span>
                     </div>
 
-                    <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
-                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                            Avg Resolution Time
+                    <div className="border border-zinc-800 bg-[#121212] rounded p-4">
+                        <div className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2">
+                            Avg Duration
                         </div>
-                        <div className="text-3xl font-extrabold tracking-tight">
+                        <div className="text-2xl font-bold font-mono text-white">
                             {stats?.avgResolutionTime || '0.0d'}
                         </div>
-                        <span className="text-xs text-muted-foreground mt-2 block">Real-time compute</span>
+                        <span className="text-[10px] font-mono text-zinc-500 mt-2 block">Computed on-the-fly</span>
                     </div>
 
-                    <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
-                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                            On-Time Delivery
+                    <div className="border border-zinc-800 bg-[#121212] rounded p-4">
+                        <div className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2">
+                            On-Time Rate
                         </div>
-                        <div className="text-3xl font-extrabold tracking-tight text-emerald-500">
+                        <div className="text-2xl font-bold font-mono text-emerald-400">
                             {stats?.onTimeDeliveryRate || '100%'}
                         </div>
-                        <span className="text-xs text-muted-foreground mt-2 block">Within due date</span>
+                        <span className="text-[10px] font-mono text-zinc-500 mt-2 block">Due date compliance</span>
                     </div>
 
-                    <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
-                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                            Quality Score
+                    <div className="border border-zinc-800 bg-[#121212] rounded p-4">
+                        <div className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2">
+                            Quality Rating
                         </div>
-                        <div className="text-3xl font-extrabold tracking-tight text-blue-500">
+                        <div className="text-2xl font-bold font-mono text-pink-400">
                             {stats?.qualityScore || '98.5%'}
                         </div>
-                        <span className="text-xs text-muted-foreground mt-2 block">Deliverable rating</span>
+                        <span className="text-[10px] font-mono text-zinc-500 mt-2 block">Deliverable score</span>
                     </div>
 
-                    <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
-                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                            Availability Rate
+                    <div className="border border-zinc-800 bg-[#121212] rounded p-4">
+                        <div className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2">
+                            Availability
                         </div>
-                        <div className="text-3xl font-extrabold tracking-tight text-purple-500">
+                        <div className="text-2xl font-bold font-mono text-white">
                             {stats?.availabilityRate || '100.0%'}
                         </div>
-                        <span className="text-xs text-muted-foreground mt-2 block">Active status</span>
+                        <span className="text-[10px] font-mono text-zinc-500 mt-2 block">Sprint participation</span>
                     </div>
                 </div>
             ) : (
                 /* Attendance Logs List */
-                <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-                    <h3 className="text-base font-bold mb-1">Attendance Verification Activity</h3>
-                    <p className="text-xs text-muted-foreground mb-6">
-                        Verified log of all task assignments and issue resolutions contributing to your attendance standing.
+                <div className="border border-zinc-800 bg-[#121212] rounded p-5">
+                    <h3 className="text-sm font-bold font-mono text-white mb-1">Audit Ledger</h3>
+                    <p className="text-xs font-mono text-zinc-500 mb-4">
+                        Verified events where tasks were assigned or resolved.
                     </p>
 
                     {!user?.attendanceLogs || user.attendanceLogs.length === 0 ? (
-                        <div className="text-center py-10 text-muted-foreground text-xs">
-                            No attendance logs yet. Resolve an issue or assign a task to earn attendance!
+                        <div className="text-center py-8 text-zinc-500 text-xs font-mono">
+                            No attendance logs on record yet.
                         </div>
                     ) : (
-                        <div className="space-y-3">
+                        <div className="space-y-2">
                             {user.attendanceLogs.map((log: any, idx: number) => (
-                                <div key={idx} className="flex items-center justify-between p-3.5 bg-secondary/40 rounded-xl border border-border text-xs">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold">
+                                <div key={idx} className="flex items-center justify-between p-3 bg-[#0a0a0a] rounded border border-zinc-800 text-xs">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-5 h-5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-mono font-bold text-[10px]">
                                             ✓
                                         </div>
                                         <div>
-                                            <div className="font-semibold text-foreground">{log.reason}</div>
-                                            <div className="text-[11px] text-muted-foreground">
+                                            <div className="font-mono text-white">{log.reason}</div>
+                                            <div className="text-[10px] font-mono text-zinc-500">
                                                 {new Date(log.date).toLocaleString()}
                                             </div>
                                         </div>
                                     </div>
-                                    <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-500 font-semibold">
-                                        +1 Credit
+                                    <span className="px-2 py-0.5 rounded bg-pink-500/10 text-pink-400 border border-pink-500/30 text-[10px] font-mono font-semibold">
+                                        +1 PTS
                                     </span>
                                 </div>
                             ))}

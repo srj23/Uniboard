@@ -7,7 +7,6 @@ const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Board = lazy(() => import('./pages/Board'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Pricing = lazy(() => import('./pages/Pricing'));
 const Contact = lazy(() => import('./pages/Contact'));
@@ -28,7 +27,6 @@ function App() {
                         <Route path="contact" element={<Contact />} />
                         <Route path="about" element={<About />} />
                     </Route>
-                    <Route path="/board/:id" element={<Board />} />
                 </Routes>
             </Suspense>
         </Router>

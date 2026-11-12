@@ -1,30 +1,30 @@
-# Uniboard
-Uniboard is a professional-grade, real-time collaborative whiteboard application designed for teams and individuals to brainstorm, plan, and create together. Built with the MERN stack (MongoDB, Express, React, Node.js) and powered by Socket.IO for instant updates.
+# Issueflow
 
-<image src="https://github.com/Hunter87ff/uniboard/blob/main/assets/landing_ss.png?raw=true"/>
+Issueflow is a modern, real-time issue tracking and project workflow management platform built for agile development teams. Engineered with the MERN stack (MongoDB, Express, React, Node.js) with TypeScript and powered by Socket.IO for instant live issue status synchronization.
 
+---
 
-## 🚀 Features
+## 🚀 Key Features
 
-### Core Whiteboard
-*   **Shapes:** Draw Rectangles, Circles, and more.
-*   **Connectors:** Smart arrows (Straight, Elbow) to connect elements.
-*   **Text:** Add text anywhere or double-click shapes to add labels.
-*   **Images:** Paste images directly from your clipboard (Ctrl+V).
-*   **Icons:** Integrated emoji icon library.
-*   **Manipulation:** Select, Move, Resize, and Delete elements.
-*   **Navigation:** Pan and Zoom canvas controls.
+### 📋 Project & Issue Management
+*   **Structured Projects:** Organize sprint deliverables into focused project workspaces with priorities, deadlines, and milestones.
+*   **Issue Lifecycle:** Seamless status workflow transitions (`Open` ➔ `In Progress` ➔ `Resolved` ➔ `Closed`).
+*   **Priority & Filtering:** Filter issues by status, priority (`High`, `Medium`, `Low`), assigned team member, or project.
+*   **Issue Codes:** Unique, readable issue identifiers (e.g., `#IF-104`) for fast team discussions.
 
-### Collaboration & Real-time
-*   **Live Updates:** See changes from other users instantly via Socket.IO.
-*   **Multi-user Support:** Collaborate on the same board simultaneously.
-*   **Cursor Tracking:** (Optional/Planned) See other users' cursors.
+### 👥 Role-Based Governance
+*   **Admin:** Full control over project creation, issue assignment, user roles, and team administration.
+*   **Team Member:** Manage assigned deliverables, transition tasks from `In Progress` to `Resolved`, and earn attendance credits.
+*   **Viewer:** Read-only access to inspect project roadmaps and issue status.
 
-### Dashboard & Management
-*   **User Authentication:** Secure Signup and Login.
-*   **Board Management:** Create, Delete, and Search for boards.
-*   **Templates:** Start with blank canvases or predefined templates (Flowchart, Mind Map, etc.).
-*   **Modern UI:** Sleek, responsive design with dark/light mode aesthetics.
+### ⏱️ Automated Attendance & Performance Ledger
+*   **Merit-Driven Credits:** Automatically logs verified attendance entries when Admins delegate tasks and Team Members resolve deliverables.
+*   **Delivery Metrics:** Computes resolution durations and on-time completion rates visible on the personal performance dashboard.
+
+### ⚡ Real-Time Collaboration
+*   **Live Updates:** Socket.IO synchronization keeps team boards up to date across active browser tabs without manual page refreshes.
+
+---
 
 ## 🛠️ Tech Stack
 
@@ -32,92 +32,71 @@ Uniboard is a professional-grade, real-time collaborative whiteboard application
 *   **React** (Vite)
 *   **TypeScript**
 *   **Tailwind CSS** (Styling)
-*   **Framer Motion** (Animations)
-*   **Socket.IO Client** (Real-time communication)
+*   **Framer Motion** (Fluid animations)
+*   **Socket.IO Client** (Real-time events)
 *   **Lucide React** (Icons)
-*   **React Router DOM** (Routing)
+*   **React Router DOM** (Client-side routing)
 
 ### Backend
 *   **Node.js** & **Express**
 *   **MongoDB** & **Mongoose** (Database)
-*   **Socket.IO** (Real-time server)
-*   **JWT** (JSON Web Tokens for Authentication)
+*   **Socket.IO** (Real-time WebSocket server)
+*   **JWT** (JSON Web Tokens for secure authentication)
 *   **Bcryptjs** (Password hashing)
 
-## 📦 Installation
+---
+
+## 📦 Installation & Setup
 
 ### Prerequisites
-*   Node.js (v14+ recommended)
-*   MongoDB (Local instance or Atlas URI)
-*   Yarn or npm
+*   Node.js (v16+ recommended)
+*   MongoDB (Local instance or MongoDB Atlas URI)
+*   npm or yarn
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/hunter87ff/uniboard.git
-cd uniboard
+git clone https://github.com/hunter87ff/issueflow.git
+cd issueflow
 ```
 
 ### 2. Backend Setup
 Navigate to the server directory and install dependencies:
 ```bash
 cd server
-yarn install  # or npm install
+npm install
 ```
 
-Create a `.env` file in the `server` directory with the following variables:
+Create a `.env` file in the `server` directory:
 ```env
 PORT=5000
 CLIENT_ORIGIN=http://localhost:5173
-MONGODB_URI=mongodb://localhost:27017/uniboard
-JWT_SECRET=your_super_secret_key_here
+MONGODB_URI=mongodb://localhost:27017/issueflow
+JWT_SECRET=your_super_secret_jwt_key
 JWT_EXPIRES_IN=1d
 ```
 
 Start the backend server:
 ```bash
-yarn dev      # or npm run dev
+npm run dev
 ```
 
 ### 3. Frontend Setup
-Open a new terminal, navigate to the client directory, and install dependencies:
+Open a new terminal, navigate to the `client` directory, and install dependencies:
 ```bash
 cd client
-yarn install  # or npm install
+npm install
 ```
 
 Start the frontend development server:
 ```bash
-yarn dev      # or npm run dev
+npm run dev
 ```
+
+---
 
 ## 🖥️ Usage
 
-1.  Ensure both backend (`port 5000`) and frontend (`port 5173`) servers are running.
-2.  Open your browser and navigate to `http://localhost:5173`.
-3.  **Sign Up** for a new account.
-4.  **Create a Board** from the dashboard.
-5.  Start drawing and collaborating!
-
-## ⌨️ Keyboard Shortcuts
-
-| Key | Action |
-|-----|--------|
-| **V** | Select Tool |
-| **H** | Pan Tool |
-| **R** | Rectangle Tool |
-| **C** | Circle Tool |
-| **L** | Arrow/Line Tool |
-| **T** | Text Tool |
-| **Space** | Hold to Pan |
-| **Ctrl+Z** | Undo |
-| **Ctrl+Y** | Redo |
-| **Ctrl+C/V** | Copy / Paste |
-| **Del** | Delete Selected |
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
+1. Ensure both backend (`port 5000`) and frontend (`port 5173`) are running.
+2. Open `http://localhost:5173` in your browser.
+3. Sign up for an account (Admins can create projects & assign issues; Team members resolve issues to earn attendance).
+4. Track your team's deliverables seamlessly!

@@ -5,16 +5,16 @@ const Footer = () => {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="relative mt-24 border-t border-border bg-card/50 backdrop-blur-sm">
+        <footer className="mt-24 border-t border-border bg-[#0d0d0d]">
             <div className="container mx-auto px-4 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                     {/* Brand Section */}
                     <div className="col-span-1 md:col-span-2">
-                        <Link to="/" className="text-2xl font-bold text-white bg-clip-text text-transparent inline-block mb-3">
-                            Uniboard
+                        <Link to="/" className="font-mono text-lg font-bold text-white tracking-tight inline-block mb-3">
+                            issue<span className="text-pink-500">flow</span>
                         </Link>
-                        <p className="text-muted-foreground mb-4 max-w-md text-sm leading-relaxed">
-                            The all-in-one workspace unifying real-time collaborative whiteboards, automated issue flow, and transparent attendance tracking. Sketch, resolve deliverables, and measure team productivity seamlessly.
+                        <p className="text-muted-foreground mb-4 max-w-md text-xs leading-relaxed font-mono">
+                            Opinionated sprint & issue tracking for engineers. High-contrast, minimal overhead, clear role governance.
                         </p>
                     </div>
 
@@ -56,16 +56,13 @@ const Footer = () => {
                 {/* Bottom Bar */}
                 <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-sm text-muted-foreground">
-                        © {currentYear} Uniboard. All rights reserved.
+                        © {currentYear} Issueflow. All rights reserved.
                     </p>
                     <p className="text-sm text-muted-foreground flex items-center gap-1">
                         Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> by the <a href="https://github.com/NexinLabs" >NexinLabs</a> Team
                     </p>
                 </div>
             </div>
-
-            {/* Gradient Decoration */}
-            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
         </footer>
     );
 };

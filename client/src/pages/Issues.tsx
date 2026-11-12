@@ -3,7 +3,6 @@ import api from '../utils/api';
 import { 
     Plus, 
     Search, 
-    AlertCircle,
     Check,
     Trash2
 } from 'lucide-react';
@@ -78,38 +77,39 @@ const Issues = ({ currentUser }: IssuesProps) => {
                 api.get('/api/performance/team')
             ]);
             setProjects(projRes.data);
+            if (projRes.data && projRes.data.length > 0) {
+                setNewProjectId(projRes.data[0]._id);
+            }
             setTeamMembers(teamRes.data);
-            if (projRes.data.length > 0) setNewProjectId(projRes.data[0]._id);
         } catch (err) {
-            console.error('Failed to load filter options', err);
+            console.error('Failed to load dropdown data', err);
         }
     };
-
-    useEffect(() => {
-        fetchDropdownData();
-    }, []);
 
     useEffect(() => {
         fetchIssues();
     }, [activeTab, statusFilter, priorityFilter, projectFilter, search]);
 
+    useEffect(() => {
+        fetchDropdownData();
+    }, []);
+
+    // Create Issue handler (Admin only)
     const handleCreateIssue = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newTitle.trim() || !newProjectId) return;
-
         try {
             const payload: any = {
                 title: newTitle,
                 description: newDescription,
                 project: newProjectId,
-                priority: newPriority,
+                priority: newPriority
             };
-            if (newAssignedTo && newAssignedTo.trim()) payload.assignedTo = newAssignedTo;
-            if (newDueDate && newDueDate.trim()) payload.dueDate = newDueDate;
+            if (newAssignedTo) payload.assignedTo = newAssignedTo;
+            if (newDueDate) payload.dueDate = newDueDate;
 
             const res = await api.post('/api/issues', payload);
             if (res.data.attendanceAwarded) {
-                alert('Issue created & assigned! +1 Attendance point credited to you for delegating tasks.');
+                alert('Issue created & assigned. Attendance point credited.');
             }
             setShowModal(false);
             setNewTitle('');
@@ -121,12 +121,12 @@ const Issues = ({ currentUser }: IssuesProps) => {
         }
     };
 
-    // Update Issue status (Team member can resolve or in_progress; Admin can set any)
+    // Update Issue status
     const handleStatusChange = async (issueId: string, newStatus: string) => {
         try {
             const res = await api.put(`/api/issues/${issueId}`, { status: newStatus });
             if (res.data.attendanceAwarded) {
-                alert('Congratulations! Issue marked as Resolved. +1 Attendance point credited to your performance.');
+                alert('Issue marked as Resolved. Attendance credited.');
             }
             fetchIssues();
         } catch (err: any) {
@@ -136,7 +136,7 @@ const Issues = ({ currentUser }: IssuesProps) => {
 
     // Delete issue permanently (Admin only)
     const handleDeleteIssue = async (issueId: string) => {
-        if (!confirm('Are you sure you want to permanently delete this issue? This cannot be undone.')) return;
+        if (!confirm('Are you sure you want to permanently delete this issue?')) return;
         try {
             await api.delete(`/api/issues/${issueId}`);
             fetchIssues();
@@ -149,93 +149,92 @@ const Issues = ({ currentUser }: IssuesProps) => {
         switch (priority) {
             case 'high':
             case 'critical':
-                return <span className="text-xs px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-500 font-medium">high</span>;
+                return <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/30 uppercase">high</span>;
             case 'medium':
-                return <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 font-medium">medium</span>;
+                return <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30 uppercase">med</span>;
             default:
-                return <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-500 font-medium">low</span>;
+                return <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700 uppercase">low</span>;
         }
     };
 
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'resolved':
-                return <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-medium">resolved</span>;
+                return <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 uppercase">resolved</span>;
             case 'in_progress':
-                return <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-500 font-medium">in progress</span>;
+                return <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-pink-500/10 text-pink-400 border border-pink-500/30 uppercase">in progress</span>;
             case 'closed':
-                return <span className="text-xs px-2.5 py-0.5 rounded-full bg-secondary text-muted-foreground font-medium">closed</span>;
+                return <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-zinc-900 text-zinc-500 border border-zinc-800 uppercase">closed</span>;
             default:
-                return <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-500 font-medium">open</span>;
+                return <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30 uppercase">open</span>;
         }
     };
 
     return (
-        <div className="space-y-6">
-            {/* Header matching Screenshot 4 */}
-            <div className="bg-card border border-border rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-lg">
+        <div className="space-y-4">
+            {/* Header */}
+            <div className="border border-zinc-800 bg-[#121212] rounded p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded bg-pink-500 text-black flex items-center justify-center font-mono font-bold text-sm">
                         #
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Issues Management</h2>
-                        <p className="text-xs text-muted-foreground">Track, organize and resolve project issues efficiently</p>
+                        <h2 className="text-xl font-bold font-mono tracking-tight text-white">Issue Tracker</h2>
+                        <p className="text-xs font-mono text-zinc-500">Pipeline & deliverable status</p>
                     </div>
                 </div>
 
                 {canCreateAndAssign && (
                     <button
                         onClick={() => setShowModal(true)}
-                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-xl transition shadow-sm"
+                        className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-pink-500 hover:bg-pink-400 text-black font-semibold text-xs font-mono rounded transition-colors"
                     >
-                        <Plus className="w-4 h-4" />
-                        Create New Issue
+                        <Plus className="w-3.5 h-3.5" />
+                        Create Issue
                     </button>
                 )}
             </div>
 
             {/* Toggle Tabs: My Issues vs Team Issues */}
-            <div className="flex bg-secondary/50 p-1 rounded-xl border border-border max-w-md">
+            <div className="flex bg-[#121212] p-1 rounded border border-zinc-800 max-w-xs">
                 <button
                     onClick={() => setActiveTab('my')}
-                    className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
-                        activeTab === 'my' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                    className={`flex-1 py-1.5 text-xs font-mono font-medium rounded transition-colors ${
+                        activeTab === 'my' ? 'bg-pink-500 text-black font-semibold' : 'text-zinc-400 hover:text-white'
                     }`}
                 >
-                    My Issues
+                    Assigned To Me
                 </button>
                 <button
                     onClick={() => setActiveTab('team')}
-                    className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
-                        activeTab === 'team' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                    className={`flex-1 py-1.5 text-xs font-mono font-medium rounded transition-colors ${
+                        activeTab === 'team' ? 'bg-pink-500 text-black font-semibold' : 'text-zinc-400 hover:text-white'
                     }`}
                 >
-                    Team Issues
+                    All Issues
                 </button>
             </div>
 
-            {/* Filter Bar matching Screenshot 4 */}
-            <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
-                <div className="text-xs font-semibold text-muted-foreground">Filter Issues</div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {/* Filter Bar */}
+            <div className="border border-zinc-800 bg-[#121212] rounded p-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
                         <input
                             type="text"
-                            placeholder="Search by title, description, code..."
+                            placeholder="Filter by keyword..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-9 pr-3 py-2 bg-secondary/50 border border-border rounded-xl text-xs outline-none focus:border-primary"
+                            className="w-full pl-8 pr-3 py-1.5 bg-[#0a0a0a] border border-zinc-800 rounded text-xs font-mono text-white outline-none focus:border-pink-500"
                         />
                     </div>
 
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="px-3 py-2 bg-secondary/50 border border-border rounded-xl text-xs outline-none focus:border-primary"
+                        className="px-2.5 py-1.5 bg-[#0a0a0a] border border-zinc-800 rounded text-xs font-mono text-zinc-300 outline-none focus:border-pink-500"
                     >
-                        <option value="all">All Statuses</option>
+                        <option value="all">Status: All</option>
                         <option value="open">Open</option>
                         <option value="in_progress">In Progress</option>
                         <option value="resolved">Resolved</option>
@@ -245,9 +244,9 @@ const Issues = ({ currentUser }: IssuesProps) => {
                     <select
                         value={priorityFilter}
                         onChange={(e) => setPriorityFilter(e.target.value)}
-                        className="px-3 py-2 bg-secondary/50 border border-border rounded-xl text-xs outline-none focus:border-primary"
+                        className="px-2.5 py-1.5 bg-[#0a0a0a] border border-zinc-800 rounded text-xs font-mono text-zinc-300 outline-none focus:border-pink-500"
                     >
-                        <option value="all">All Priorities</option>
+                        <option value="all">Priority: All</option>
                         <option value="low">Low</option>
                         <option value="medium">Medium</option>
                         <option value="high">High</option>
@@ -257,9 +256,9 @@ const Issues = ({ currentUser }: IssuesProps) => {
                     <select
                         value={projectFilter}
                         onChange={(e) => setProjectFilter(e.target.value)}
-                        className="px-3 py-2 bg-secondary/50 border border-border rounded-xl text-xs outline-none focus:border-primary"
+                        className="px-2.5 py-1.5 bg-[#0a0a0a] border border-zinc-800 rounded text-xs font-mono text-zinc-300 outline-none focus:border-pink-500"
                     >
-                        <option value="all">All Projects</option>
+                        <option value="all">Project: All</option>
                         {projects.map((p) => (
                             <option key={p._id} value={p._id}>{p.title}</option>
                         ))}
@@ -268,59 +267,53 @@ const Issues = ({ currentUser }: IssuesProps) => {
             </div>
 
             {/* Issue List */}
-            <div className="space-y-3">
-                <div className="text-xs font-semibold text-muted-foreground px-1">
-                    {issues.length} Issues found
-                </div>
-
+            <div className="space-y-2">
                 {loading ? (
-                    <div className="py-12 text-center text-xs text-muted-foreground">Loading issues...</div>
+                    <div className="p-8 border border-zinc-800 bg-[#121212] rounded text-center text-xs font-mono text-zinc-500">
+                        Querying database...
+                    </div>
                 ) : issues.length === 0 ? (
-                    <div className="bg-card border border-border rounded-2xl p-12 text-center">
-                        <AlertCircle className="w-10 h-10 mx-auto text-muted-foreground mb-3 opacity-40" />
-                        <h4 className="font-semibold text-sm">No issues found</h4>
-                        <p className="text-xs text-muted-foreground mt-1">
-                            {canCreateAndAssign ? 'Create an issue to assign work to your team.' : 'Great job! No pending issues matching this filter.'}
-                        </p>
+                    <div className="p-10 border border-zinc-800 bg-[#121212] rounded text-center">
+                        <div className="text-zinc-500 text-xs font-mono">No matching issues found.</div>
                     </div>
                 ) : (
                     issues.map((issue) => {
-                        const isAssignedToMe = issue.assignedTo?._id === currentUser?._id;
+                        const isAssignedToMe = issue.assignedTo && (issue.assignedTo._id === currentUser?.id || issue.assignedTo._id === currentUser?._id);
+
                         return (
-                            <div key={issue._id} className="bg-card border border-border rounded-2xl p-5 hover:border-primary/40 transition-colors">
-                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                    <div className="space-y-1.5 flex-1">
+                            <div key={issue._id} className="border border-zinc-800 bg-[#121212] rounded p-4 hover:border-zinc-700 transition-colors">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                                    <div className="space-y-1 flex-1">
                                         <div className="flex items-center gap-2 flex-wrap">
-                                            <span className="text-xs font-mono text-muted-foreground">{issue.issueCode}</span>
+                                            <span className="text-xs font-mono text-pink-400 font-bold">{issue.issueCode}</span>
                                             {getPriorityBadge(issue.priority)}
                                             {getStatusBadge(issue.status)}
                                             {issue.resolveDuration && (
-                                                <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 font-medium">
-                                                    Resolve Time: {issue.resolveDuration}
+                                                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                                                    Duration: {issue.resolveDuration}
                                                 </span>
                                             )}
                                         </div>
 
-                                        <h3 className="font-semibold text-sm text-foreground">{issue.title}</h3>
+                                        <h3 className="font-semibold text-sm text-white">{issue.title}</h3>
 
-                                        <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
-                                            <span className="font-medium text-foreground">{issue.project?.title || 'General'}</span>
+                                        <div className="flex items-center gap-3 text-xs font-mono text-zinc-500 flex-wrap">
+                                            <span>PROJECT: <strong className="text-zinc-300 font-normal">{issue.project?.title || 'General'}</strong></span>
                                             {issue.dueDate && (
-                                                <span>• Due {new Date(issue.dueDate).toLocaleDateString()}</span>
+                                                <span>DUE: {new Date(issue.dueDate).toLocaleDateString()}</span>
                                             )}
                                             {issue.assignedTo && (
-                                                <span>• Assigned: <strong className="text-foreground">{issue.assignedTo.displayName || issue.assignedTo.username}</strong></span>
+                                                <span>ASSIGNEE: <strong className="text-zinc-300 font-normal">{issue.assignedTo.displayName || issue.assignedTo.username}</strong></span>
                                             )}
                                         </div>
                                     </div>
 
-                                    {/* Action buttons (Move status) */}
+                                    {/* Action buttons */}
                                     <div className="flex items-center gap-2 self-end md:self-center">
-                                        {/* Status transitions based on user role */}
                                         {issue.status !== 'in_progress' && issue.status !== 'resolved' && (isAssignedToMe || canCreateAndAssign) && (
                                             <button
                                                 onClick={() => handleStatusChange(issue._id, 'in_progress')}
-                                                className="px-3 py-1.5 rounded-xl text-xs font-medium bg-purple-500/10 text-purple-600 hover:bg-purple-500/20 transition"
+                                                className="px-2.5 py-1 rounded text-xs font-mono font-medium bg-zinc-800 text-zinc-300 hover:bg-zinc-700 border border-zinc-700 transition"
                                             >
                                                 Start Working
                                             </button>
@@ -329,33 +322,33 @@ const Issues = ({ currentUser }: IssuesProps) => {
                                         {issue.status !== 'resolved' && (isAssignedToMe || canCreateAndAssign) && (
                                             <button
                                                 onClick={() => handleStatusChange(issue._id, 'resolved')}
-                                                className="px-3 py-1.5 rounded-xl text-xs font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition flex items-center gap-1.5"
+                                                className="px-2.5 py-1 rounded text-xs font-mono font-medium bg-pink-500 hover:bg-pink-400 text-black transition flex items-center gap-1"
                                             >
-                                                <Check className="w-3.5 h-3.5" />
-                                                Resolve & Earn Attendance
+                                                <Check className="w-3 h-3" />
+                                                Resolve
                                             </button>
                                         )}
 
                                         {canCreateAndAssign && issue.status === 'resolved' && (
                                             <button
                                                 onClick={() => handleStatusChange(issue._id, 'closed')}
-                                                className="px-3 py-1.5 rounded-xl text-xs font-medium bg-secondary text-muted-foreground hover:bg-secondary/80 transition"
+                                                className="px-2.5 py-1 rounded text-xs font-mono font-medium bg-zinc-800 text-zinc-400 hover:text-white transition"
                                             >
-                                                Close Issue
+                                                Close
                                             </button>
                                         )}
 
                                         {canCreateAndAssign && (
                                             <button
                                                 onClick={() => handleDeleteIssue(issue._id)}
-                                                className="p-1.5 rounded-xl text-muted-foreground hover:bg-rose-500/10 hover:text-rose-500 transition"
-                                                title="Delete issue permanently"
+                                                className="p-1 rounded text-zinc-500 hover:text-rose-400 transition"
+                                                title="Delete issue"
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                <Trash2 className="w-3.5 h-3.5" />
                                             </button>
                                         )}
 
-                                        <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold ml-2">
+                                        <div className="w-6 h-6 rounded bg-zinc-800 border border-zinc-700 text-zinc-300 flex items-center justify-center text-[10px] font-mono font-bold ml-1">
                                             {issue.assignedTo?.displayName?.substring(0, 2).toUpperCase() || 'TM'}
                                         </div>
                                     </div>
@@ -368,34 +361,34 @@ const Issues = ({ currentUser }: IssuesProps) => {
 
             {/* Create Issue Modal */}
             {showModal && (
-                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-card border border-border rounded-2xl max-w-lg w-full p-6 shadow-2xl">
-                        <h3 className="text-lg font-bold mb-1">Create & Assign New Issue</h3>
-                        <p className="text-xs text-muted-foreground mb-4">
-                            Delegating tasks grants you management attendance points automatically.
-                        </p>
+                <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+                    <div className="bg-[#121212] border border-zinc-800 rounded max-w-lg w-full p-6 shadow-2xl">
+                        <div className="flex items-center justify-between pb-3 border-b border-zinc-800 mb-4">
+                            <h3 className="text-base font-bold font-mono text-white">Create New Deliverable</h3>
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-pink-500/10 text-pink-400 border border-pink-500/30">ADMIN_ACTION</span>
+                        </div>
 
-                        <form onSubmit={handleCreateIssue} className="space-y-4">
+                        <form onSubmit={handleCreateIssue} className="space-y-3.5">
                             <div>
-                                <label className="block text-xs font-medium text-muted-foreground mb-1">Issue Title</label>
+                                <label className="block text-xs font-mono text-zinc-400 mb-1">Issue Title</label>
                                 <input
                                     type="text"
                                     required
-                                    placeholder="e.g. Scroll bar added on hello teacher sidebar"
+                                    placeholder="e.g. Implement refresh token rotation"
                                     value={newTitle}
                                     onChange={(e) => setNewTitle(e.target.value)}
-                                    className="w-full px-3 py-2 bg-secondary/50 border border-border rounded-xl text-xs outline-none focus:border-primary"
+                                    className="w-full px-3 py-2 bg-[#0a0a0a] border border-zinc-800 rounded text-xs font-mono text-white outline-none focus:border-pink-500"
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-xs font-medium text-muted-foreground mb-1">Project</label>
+                                    <label className="block text-xs font-mono text-zinc-400 mb-1">Project</label>
                                     <select
                                         required
                                         value={newProjectId}
                                         onChange={(e) => setNewProjectId(e.target.value)}
-                                        className="w-full px-3 py-2 bg-secondary/50 border border-border rounded-xl text-xs outline-none focus:border-primary"
+                                        className="w-full px-2.5 py-2 bg-[#0a0a0a] border border-zinc-800 rounded text-xs font-mono text-zinc-300 outline-none focus:border-pink-500"
                                     >
                                         {projects.map((p) => (
                                             <option key={p._id} value={p._id}>{p.title}</option>
@@ -404,11 +397,11 @@ const Issues = ({ currentUser }: IssuesProps) => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-medium text-muted-foreground mb-1">Priority</label>
+                                    <label className="block text-xs font-mono text-zinc-400 mb-1">Priority</label>
                                     <select
                                         value={newPriority}
                                         onChange={(e: any) => setNewPriority(e.target.value)}
-                                        className="w-full px-3 py-2 bg-secondary/50 border border-border rounded-xl text-xs outline-none focus:border-primary"
+                                        className="w-full px-2.5 py-2 bg-[#0a0a0a] border border-zinc-800 rounded text-xs font-mono text-zinc-300 outline-none focus:border-pink-500"
                                     >
                                         <option value="low">Low</option>
                                         <option value="medium">Medium</option>
@@ -420,11 +413,11 @@ const Issues = ({ currentUser }: IssuesProps) => {
 
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-xs font-medium text-muted-foreground mb-1">Assign To Team Member</label>
+                                    <label className="block text-xs font-mono text-zinc-400 mb-1">Assignee</label>
                                     <select
                                         value={newAssignedTo}
                                         onChange={(e) => setNewAssignedTo(e.target.value)}
-                                        className="w-full px-3 py-2 bg-secondary/50 border border-border rounded-xl text-xs outline-none focus:border-primary"
+                                        className="w-full px-2.5 py-2 bg-[#0a0a0a] border border-zinc-800 rounded text-xs font-mono text-zinc-300 outline-none focus:border-pink-500"
                                     >
                                         <option value="">Select Assignee</option>
                                         {teamMembers.map((m) => (
@@ -436,40 +429,40 @@ const Issues = ({ currentUser }: IssuesProps) => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-medium text-muted-foreground mb-1">Due Date</label>
+                                    <label className="block text-xs font-mono text-zinc-400 mb-1">Due Date</label>
                                     <input
                                         type="date"
                                         value={newDueDate}
                                         onChange={(e) => setNewDueDate(e.target.value)}
-                                        className="w-full px-3 py-2 bg-secondary/50 border border-border rounded-xl text-xs outline-none focus:border-primary"
+                                        className="w-full px-2.5 py-1.5 bg-[#0a0a0a] border border-zinc-800 rounded text-xs font-mono text-zinc-300 outline-none focus:border-pink-500"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-xs font-medium text-muted-foreground mb-1">Description</label>
+                                <label className="block text-xs font-mono text-zinc-400 mb-1">Implementation Notes</label>
                                 <textarea
-                                    placeholder="Steps to reproduce, expected result, or implementation notes..."
+                                    placeholder="Technical scope, API contract, or reproduction steps..."
                                     rows={3}
                                     value={newDescription}
                                     onChange={(e) => setNewDescription(e.target.value)}
-                                    className="w-full px-3 py-2 bg-secondary/50 border border-border rounded-xl text-xs outline-none focus:border-primary"
+                                    className="w-full px-3 py-2 bg-[#0a0a0a] border border-zinc-800 rounded text-xs font-mono text-white outline-none focus:border-pink-500"
                                 />
                             </div>
 
-                            <div className="flex items-center justify-end gap-2 pt-2">
+                            <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-800">
                                 <button
                                     type="button"
                                     onClick={() => setShowModal(false)}
-                                    className="px-4 py-2 rounded-xl text-xs font-medium bg-secondary hover:bg-secondary/80 text-foreground"
+                                    className="px-3 py-1.5 rounded text-xs font-mono text-zinc-400 hover:text-white"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 rounded-xl text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white"
+                                    className="px-4 py-1.5 rounded text-xs font-mono font-semibold bg-pink-500 hover:bg-pink-400 text-black"
                                 >
-                                    Create & Award Attendance
+                                    Confirm & Delegate
                                 </button>
                             </div>
                         </form>

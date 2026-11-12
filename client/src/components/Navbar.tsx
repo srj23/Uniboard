@@ -65,13 +65,13 @@ const Navbar = () => {
                     {/* Logo */}
                     <Link
                         to="/"
-                        className="flex items-center gap-2 font-bold text-xl hover:opacity-90 transition-opacity"
+                        className="flex items-center gap-2.5 font-bold text-lg hover:opacity-90 transition-opacity"
                     >
-                        <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-sm">
-                            UB
+                        <div className="w-8 h-8 rounded-md bg-pink-500 text-black flex items-center justify-center font-black text-sm tracking-tighter shadow-sm">
+                            IF
                         </div>
-                        <span className="bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
-                            Uniboard
+                        <span className="font-mono text-base font-bold tracking-tight text-white">
+                            issue<span className="text-pink-500">flow</span>
                         </span>
                     </Link>
 
@@ -110,7 +110,7 @@ const Navbar = () => {
                                         onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                                         className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50 hover:bg-secondary transition-all duration-200"
                                     >
-                                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
+                                        <div className="w-8 h-8 rounded-md bg-pink-500/20 border border-pink-500/50 flex items-center justify-center text-pink-400 font-semibold text-xs font-mono">
                                             {user.username.charAt(0).toUpperCase()}
                                         </div>
                                         <span className="text-sm font-medium">{user.username}</span>

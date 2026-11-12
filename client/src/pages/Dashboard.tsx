@@ -1,5 +1,4 @@
 import { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import api from '../utils/api';
 import { 
@@ -8,11 +7,8 @@ import {
     CheckCircle2, 
     XCircle, 
     Users, 
-    Layers, 
     ArrowRight,
-    Plus,
-    Check,
-    Trash2
+    Check
 } from 'lucide-react';
 import Projects from './Projects';
 import Issues from './Issues';
@@ -21,13 +17,9 @@ import AdminPanel from './AdminPanel';
 
 const Dashboard = () => {
     const { user } = useContext(AuthContext);
-    const navigate = useNavigate();
     const userRole = user?.role || 'others';
 
-    // If 'others', default to whiteboards
-    const [activeSection, setActiveSection] = useState<'dashboard' | 'projects' | 'issues' | 'performance' | 'whiteboards' | 'admin'>(
-        userRole === 'others' ? 'whiteboards' : 'dashboard'
-    );
+    const [activeSection, setActiveSection] = useState<'dashboard' | 'projects' | 'issues' | 'performance' | 'admin'>('dashboard');
 
     const [metrics, setMetrics] = useState({
         open: 0,
@@ -38,48 +30,18 @@ const Dashboard = () => {
     });
     const [myRecentIssues, setMyRecentIssues] = useState<any[]>([]);
     const [activeProjects, setActiveProjects] = useState<any[]>([]);
-    const [boards, setBoards] = useState<any[]>([]);
-    const [creatingBoard, setCreatingBoard] = useState(false);
-
-    const handleCreateBoard = async () => {
-        try {
-            setCreatingBoard(true);
-            const title = prompt("Enter whiteboard title:", "Untitled Board") || "Untitled Board";
-            const res = await api.post("/api/boards", { title });
-            navigate(`/board/${res.data._id}`);
-        } catch (err: any) {
-            console.error("Failed to create board", err);
-            alert(err.response?.data?.message || err.response?.data || "Failed to create whiteboard.");
-        } finally {
-            setCreatingBoard(false);
-        }
-    };
-
-    const handleDeleteBoard = async (e: React.MouseEvent, boardId: string) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!confirm("Are you sure you want to delete this board?")) return;
-        try {
-            await api.delete(`/api/boards/${boardId}`);
-            setBoards((prev) => prev.filter((b) => b._id !== boardId));
-        } catch (err: any) {
-            alert(err.response?.data || "Failed to delete board.");
-        }
-    };
 
     const fetchDashboardData = async () => {
         try {
-            const [metricsRes, myIssuesRes, projRes, boardsRes] = await Promise.all([
+            const [metricsRes, myIssuesRes, projRes] = await Promise.all([
                 api.get('/api/issues/metrics/summary').catch(() => ({ data: { open: 0, inProgress: 0, resolved: 0, closed: 0, totalTeam: 0 } })),
                 api.get('/api/issues?assignedTo=me').catch(() => ({ data: [] })),
-                api.get('/api/projects').catch(() => ({ data: [] })),
-                api.get('/api/boards').catch(() => ({ data: [] }))
+                api.get('/api/projects').catch(() => ({ data: [] }))
             ]);
 
             setMetrics(metricsRes.data);
             setMyRecentIssues(myIssuesRes.data.slice(0, 5));
             setActiveProjects(projRes.data.slice(0, 4));
-            setBoards(boardsRes.data || []);
         } catch (err) {
             console.error('Failed to load dashboard data', err);
         }
@@ -92,7 +54,7 @@ const Dashboard = () => {
     const handleResolve = async (issueId: string) => {
         try {
             await api.put(`/api/issues/${issueId}`, { status: 'resolved' });
-            alert('Congratulations! Issue marked as Resolved. Attendance credited!');
+            alert('Issue marked as Resolved. Attendance credited!');
             fetchDashboardData();
         } catch (err: any) {
             alert(err.response?.data || 'Failed to update issue');
@@ -100,77 +62,61 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="min-h-screen bg-background text-foreground pb-20">
-            {/* Top Sub-Navigation matching Screenshot 1 & 4 */}
-            <div className="border-b border-border bg-card/60 backdrop-blur-md sticky top-16 z-30">
-                <div className="container mx-auto px-4 flex items-center gap-1 sm:gap-4 overflow-x-auto py-2">
+        <div className="min-h-screen bg-[#0a0a0a] text-zinc-100 pb-16 font-sans">
+            {/* Top Sub-nav / Breadcrumb bar */}
+            <div className="border-b border-zinc-800 bg-[#0d0d0d] sticky top-16 z-30">
+                <div className="container mx-auto px-4 flex items-center gap-1.5 overflow-x-auto py-2">
                     <button
-                        onClick={() => setActiveSection('whiteboards')}
-                        className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
-                            activeSection === 'whiteboards' 
-                                ? 'bg-primary text-primary-foreground shadow-sm' 
-                                : 'text-muted-foreground hover:text-foreground'
+                        onClick={() => setActiveSection('dashboard')}
+                        className={`px-3 py-1.5 text-xs font-mono font-medium rounded transition-colors whitespace-nowrap ${
+                            activeSection === 'dashboard' 
+                                ? 'bg-pink-500 text-black font-semibold' 
+                                : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
                         }`}
                     >
-                        <Layers className="w-3.5 h-3.5" />
-                        Whiteboards
+                        // overview
                     </button>
-
-                    {userRole !== 'others' && (
-                        <>
-                            <button
-                                onClick={() => setActiveSection('dashboard')}
-                                className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap ${
-                                    activeSection === 'dashboard' 
-                                        ? 'bg-primary text-primary-foreground shadow-sm' 
-                                        : 'text-muted-foreground hover:text-foreground'
-                                }`}
-                            >
-                                Dashboard
-                            </button>
-                            <button
-                                onClick={() => setActiveSection('projects')}
-                                className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap ${
-                                    activeSection === 'projects' 
-                                        ? 'bg-primary text-primary-foreground shadow-sm' 
-                                        : 'text-muted-foreground hover:text-foreground'
-                                }`}
-                            >
-                                Projects
-                            </button>
-                            <button
-                                onClick={() => setActiveSection('issues')}
-                                className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap ${
-                                    activeSection === 'issues' 
-                                        ? 'bg-primary text-primary-foreground shadow-sm' 
-                                        : 'text-muted-foreground hover:text-foreground'
-                                }`}
-                            >
-                                Issues
-                            </button>
-                            <button
-                                onClick={() => setActiveSection('performance')}
-                                className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap ${
-                                    activeSection === 'performance' 
-                                        ? 'bg-primary text-primary-foreground shadow-sm' 
-                                        : 'text-muted-foreground hover:text-foreground'
-                                }`}
-                            >
-                                My Performance
-                            </button>
-                        </>
-                    )}
+                    <button
+                        onClick={() => setActiveSection('projects')}
+                        className={`px-3 py-1.5 text-xs font-mono font-medium rounded transition-colors whitespace-nowrap ${
+                            activeSection === 'projects' 
+                                ? 'bg-pink-500 text-black font-semibold' 
+                                : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+                        }`}
+                    >
+                        // projects
+                    </button>
+                    <button
+                        onClick={() => setActiveSection('issues')}
+                        className={`px-3 py-1.5 text-xs font-mono font-medium rounded transition-colors whitespace-nowrap ${
+                            activeSection === 'issues' 
+                                ? 'bg-pink-500 text-black font-semibold' 
+                                : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+                        }`}
+                    >
+                        // issues
+                    </button>
+                    <button
+                        onClick={() => setActiveSection('performance')}
+                        className={`px-3 py-1.5 text-xs font-mono font-medium rounded transition-colors whitespace-nowrap ${
+                            activeSection === 'performance' 
+                                ? 'bg-pink-500 text-black font-semibold' 
+                                : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+                        }`}
+                    >
+                        // performance
+                    </button>
 
                     {userRole === 'admin' && (
                         <button
                             onClick={() => setActiveSection('admin')}
-                            className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                            className={`px-3 py-1.5 text-xs font-mono font-medium rounded transition-colors whitespace-nowrap ml-auto ${
                                 activeSection === 'admin' 
-                                    ? 'bg-purple-600 text-white shadow-sm' 
-                                    : 'text-purple-500 hover:text-purple-600'
+                                ? 'bg-zinc-200 text-black font-semibold' 
+                                : 'text-pink-400 border border-pink-500/30 hover:bg-pink-500/10'
                             }`}
                         >
-                            Admin Settings
+                            [admin settings]
                         </button>
                     )}
                 </div>
@@ -181,190 +127,112 @@ const Dashboard = () => {
                 {activeSection === 'projects' && <Projects userRole={userRole} />}
                 {activeSection === 'issues' && <Issues currentUser={user} />}
                 {activeSection === 'performance' && <MyPerformance />}
-                
-                {/* Whiteboard Canvas Studio View */}
-                {activeSection === 'whiteboards' && (
-                    <div className="space-y-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h2 className="text-2xl font-bold tracking-tight">Collaborative Whiteboards</h2>
-                                <p className="text-sm text-muted-foreground">Brainstorm, sketch architectures, and share real-time canvases</p>
-                            </div>
-                            <button 
-                                onClick={handleCreateBoard}
-                                disabled={creatingBoard}
-                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-xl transition shadow-sm disabled:opacity-50"
-                            >
-                                <Plus className="w-4 h-4" />
-                                {creatingBoard ? 'Creating...' : 'Create Canvas'}
-                            </button>
-                        </div>
 
-                        {boards.length === 0 ? (
-                            <div className="bg-card border border-border rounded-2xl p-12 text-center">
-                                <Layers className="w-12 h-12 mx-auto text-muted-foreground mb-3 opacity-40" />
-                                <h3 className="text-base font-semibold mb-1">No whiteboards created yet</h3>
-                                <p className="text-sm text-muted-foreground mb-4">Start a collaborative canvas to sketch out user flows and diagrams.</p>
-                                <button 
-                                    onClick={handleCreateBoard}
-                                    className="px-4 py-2 bg-primary text-primary-foreground text-sm rounded-xl font-medium inline-block"
-                                >
-                                    New Canvas
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {boards.map((b) => (
-                                    <div
-                                        key={b._id}
-                                        onClick={() => navigate(`/board/${b._id}`)}
-                                        className="bg-card border border-border rounded-2xl p-5 hover:border-primary/50 transition-all group relative cursor-pointer"
-                                    >
-                                        <div className="aspect-video bg-secondary/50 rounded-xl mb-4 flex items-center justify-center border border-border group-hover:scale-[1.02] transition-transform relative overflow-hidden">
-                                            <Layers className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors" />
-                                            <button
-                                                onClick={(e) => handleDeleteBoard(e, b._id)}
-                                                className="absolute top-2 right-2 p-1.5 rounded-lg bg-background/80 hover:bg-rose-500 hover:text-white text-muted-foreground transition opacity-0 group-hover:opacity-100 shadow-sm"
-                                                title="Delete board"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                        <h4 className="font-semibold text-base mb-1">{b.title || 'Untitled Board'}</h4>
-                                        <span className="text-xs text-muted-foreground">Updated {new Date(b.updatedAt || b.createdAt).toLocaleDateString()}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {/* Main Overview Dashboard (matching Screenshot 1) */}
+                {/* Main Overview Dashboard */}
                 {activeSection === 'dashboard' && (
-                    <div className="space-y-8">
-                        <div>
-                            <h1 className="text-3xl font-extrabold tracking-tight">Dashboard</h1>
-                            <p className="text-sm text-muted-foreground">Welcome back! Here's what's happening with your projects.</p>
-                        </div>
-
-                        {/* Top 5 Metric Cards matching Screenshot 1 */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                            {/* Open Issues */}
-                            <div className="bg-card border border-border rounded-2xl p-5 relative overflow-hidden shadow-sm">
-                                <div className="flex items-center justify-between mb-3">
-                                    <span className="text-xs font-semibold text-muted-foreground">Open Issues</span>
-                                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center">
-                                        <AlertCircle className="w-4 h-4" />
-                                    </div>
-                                </div>
-                                <div className="text-3xl font-extrabold">{metrics.open} <span className="text-xs font-normal text-muted-foreground">+0</span></div>
-                                <div className="text-[11px] text-muted-foreground mt-2">Issues + Sub-issues</div>
+                    <div className="space-y-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-zinc-800 gap-2">
+                            <div>
+                                <h1 className="text-2xl font-bold font-mono tracking-tight text-white">System Dashboard</h1>
+                                <p className="text-xs font-mono text-zinc-500 mt-0.5">Active sprint status & assigned deliverables</p>
                             </div>
-
-                            {/* In Progress */}
-                            <div className="bg-card border border-border rounded-2xl p-5 relative overflow-hidden shadow-sm">
-                                <div className="flex items-center justify-between mb-3">
-                                    <span className="text-xs font-semibold text-muted-foreground">In Progress</span>
-                                    <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center">
-                                        <Clock className="w-4 h-4" />
-                                    </div>
-                                </div>
-                                <div className="text-3xl font-extrabold">{metrics.inProgress} <span className="text-xs font-normal text-muted-foreground">+0</span></div>
-                                <div className="text-[11px] text-muted-foreground mt-2">Issues + Sub-issues</div>
-                            </div>
-
-                            {/* Resolved */}
-                            <div className="bg-card border border-border rounded-2xl p-5 relative overflow-hidden shadow-sm">
-                                <div className="flex items-center justify-between mb-3">
-                                    <span className="text-xs font-semibold text-muted-foreground">Resolved</span>
-                                    <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
-                                        <CheckCircle2 className="w-4 h-4" />
-                                    </div>
-                                </div>
-                                <div className="text-3xl font-extrabold text-emerald-500">{metrics.resolved} <span className="text-xs font-normal text-emerald-600">+9</span></div>
-                                <div className="text-[11px] text-muted-foreground mt-2">Issues + Sub-issues</div>
-                            </div>
-
-                            {/* Closed */}
-                            <div className="bg-card border border-border rounded-2xl p-5 relative overflow-hidden shadow-sm">
-                                <div className="flex items-center justify-between mb-3">
-                                    <span className="text-xs font-semibold text-muted-foreground">Closed</span>
-                                    <div className="w-8 h-8 rounded-xl bg-secondary text-muted-foreground flex items-center justify-center">
-                                        <XCircle className="w-4 h-4" />
-                                    </div>
-                                </div>
-                                <div className="text-3xl font-extrabold">{metrics.closed} <span className="text-xs font-normal text-muted-foreground">+0</span></div>
-                                <div className="text-[11px] text-muted-foreground mt-2">Issues + Sub-issues</div>
-                            </div>
-
-                            {/* Team Issues */}
-                            <div className="bg-card border border-border rounded-2xl p-5 relative overflow-hidden shadow-sm">
-                                <div className="flex items-center justify-between mb-3">
-                                    <span className="text-xs font-semibold text-muted-foreground">Team Issues</span>
-                                    <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
-                                        <Users className="w-4 h-4" />
-                                    </div>
-                                </div>
-                                <div className="text-3xl font-extrabold">{metrics.totalTeam}</div>
-                                <div className="text-[11px] text-muted-foreground mt-2">Workspace total</div>
+                            <div className="text-xs font-mono text-zinc-500">
+                                LOGGED_AS: <span className="text-pink-400 font-semibold">{user?.username}</span> ({userRole})
                             </div>
                         </div>
 
-                        {/* 3-Column Split Layout matching Screenshot 1 & 2 */}
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                            {/* Left: Priority Issues (3 cols) */}
-                            <div className="lg:col-span-3 bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center text-center">
-                                <div className="w-full text-left mb-6 flex items-center gap-2 text-rose-500 font-semibold text-sm">
-                                    <AlertCircle className="w-4 h-4" />
-                                    Priority Issues
+                        {/* Top 5 Metric Cards */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                            <div className="border border-zinc-800 bg-[#121212] p-4 rounded">
+                                <div className="flex items-center justify-between text-zinc-400 mb-2">
+                                    <span className="text-[11px] font-mono uppercase tracking-wider">Open</span>
+                                    <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
                                 </div>
-                                <div className="my-auto py-8">
-                                    <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-3 opacity-30" />
-                                    <div className="text-sm font-semibold">No priority issues at the moment</div>
-                                    <p className="text-xs text-muted-foreground mt-1">Great job staying on top of things! 🎉</p>
-                                </div>
+                                <div className="text-2xl font-bold font-mono text-white">{metrics.open}</div>
+                                <div className="text-[10px] font-mono text-zinc-500 mt-1">Pending kickoff</div>
                             </div>
 
-                            {/* Middle: My Issues (6 cols) */}
-                            <div className="lg:col-span-6 bg-card border border-border rounded-2xl p-6 shadow-sm">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="font-bold text-base">My Issues</h3>
+                            <div className="border border-zinc-800 bg-[#121212] p-4 rounded">
+                                <div className="flex items-center justify-between text-zinc-400 mb-2">
+                                    <span className="text-[11px] font-mono uppercase tracking-wider">In Progress</span>
+                                    <Clock className="w-3.5 h-3.5 text-pink-400" />
+                                </div>
+                                <div className="text-2xl font-bold font-mono text-white">{metrics.inProgress}</div>
+                                <div className="text-[10px] font-mono text-zinc-500 mt-1">Active branch/code</div>
+                            </div>
+
+                            <div className="border border-zinc-800 bg-[#121212] p-4 rounded">
+                                <div className="flex items-center justify-between text-zinc-400 mb-2">
+                                    <span className="text-[11px] font-mono uppercase tracking-wider">Resolved</span>
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                                </div>
+                                <div className="text-2xl font-bold font-mono text-white">{metrics.resolved}</div>
+                                <div className="text-[10px] font-mono text-zinc-500 mt-1">Attendance awarded</div>
+                            </div>
+
+                            <div className="border border-zinc-800 bg-[#121212] p-4 rounded">
+                                <div className="flex items-center justify-between text-zinc-400 mb-2">
+                                    <span className="text-[11px] font-mono uppercase tracking-wider">Closed</span>
+                                    <XCircle className="w-3.5 h-3.5 text-zinc-500" />
+                                </div>
+                                <div className="text-2xl font-bold font-mono text-white">{metrics.closed}</div>
+                                <div className="text-[10px] font-mono text-zinc-500 mt-1">Archived/Verified</div>
+                            </div>
+
+                            <div className="col-span-2 sm:col-span-1 border border-zinc-800 bg-[#121212] p-4 rounded">
+                                <div className="flex items-center justify-between text-zinc-400 mb-2">
+                                    <span className="text-[11px] font-mono uppercase tracking-wider">Total</span>
+                                    <Users className="w-3.5 h-3.5 text-zinc-400" />
+                                </div>
+                                <div className="text-2xl font-bold font-mono text-white">{metrics.totalTeam}</div>
+                                <div className="text-[10px] font-mono text-zinc-500 mt-1">System tickets</div>
+                            </div>
+                        </div>
+
+                        {/* Split Row: My Recent Issues + Active Projects */}
+                        <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
+                            {/* Left: My Recent Issues (7 cols) */}
+                            <div className="lg:col-span-7 border border-zinc-800 bg-[#121212] p-5 rounded">
+                                <div className="flex items-center justify-between mb-4 pb-2 border-b border-zinc-800">
+                                    <h3 className="font-mono text-xs uppercase tracking-wider font-semibold text-zinc-300">
+                                        Assigned Deliverables ({myRecentIssues.length})
+                                    </h3>
                                     <button 
                                         onClick={() => setActiveSection('issues')}
-                                        className="text-xs text-blue-500 hover:underline flex items-center gap-1 font-medium"
+                                        className="text-xs text-pink-400 hover:underline flex items-center gap-1 font-mono"
                                     >
-                                        View all <ArrowRight className="w-3.5 h-3.5" />
+                                        View all <ArrowRight className="w-3 h-3" />
                                     </button>
                                 </div>
 
                                 {myRecentIssues.length === 0 ? (
-                                    <div className="text-center py-12 text-muted-foreground text-xs">
-                                        No active issues assigned to you. Enjoy your clean queue!
+                                    <div className="text-center py-10 text-zinc-500 text-xs font-mono">
+                                        No active issues assigned to you.
                                     </div>
                                 ) : (
-                                    <div className="space-y-3">
+                                    <div className="space-y-2.5">
                                         {myRecentIssues.map((issue) => (
-                                            <div key={issue._id} className="p-3.5 bg-secondary/40 rounded-xl border border-border hover:border-primary/40 transition-colors">
-                                                <div className="flex items-center justify-between gap-2 mb-1.5">
+                                            <div key={issue._id} className="p-3 bg-[#0f0f0f] rounded border border-zinc-800 hover:border-zinc-700 transition">
+                                                <div className="flex items-center justify-between mb-1.5">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-xs font-mono text-muted-foreground">{issue.issueCode}</span>
-                                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 font-medium capitalize">{issue.priority}</span>
-                                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-medium capitalize">{issue.status}</span>
+                                                        <span className="text-xs font-mono text-pink-400 font-bold">{issue.issueCode}</span>
+                                                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 capitalize border border-zinc-700">{issue.priority}</span>
+                                                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 capitalize border border-zinc-700">{issue.status}</span>
                                                     </div>
                                                     {issue.status !== 'resolved' && (
                                                         <button
                                                             onClick={() => handleResolve(issue._id)}
-                                                            className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1"
+                                                            className="px-2.5 py-1 rounded text-xs font-mono font-medium bg-pink-500 hover:bg-pink-400 text-black transition flex items-center gap-1"
                                                         >
                                                             <Check className="w-3 h-3" />
-                                                            Resolve
+                                                            Mark Resolved
                                                         </button>
                                                     )}
                                                 </div>
-                                                <div className="text-xs font-semibold text-foreground">{issue.title}</div>
-                                                <div className="text-[11px] text-muted-foreground mt-1 flex items-center gap-3">
-                                                    <span>{issue.project?.title || 'General'}</span>
-                                                    {issue.dueDate && <span>Due {new Date(issue.dueDate).toLocaleDateString()}</span>}
+                                                <div className="text-xs font-medium text-white">{issue.title}</div>
+                                                <div className="text-[11px] font-mono text-zinc-500 mt-1 flex items-center gap-3">
+                                                    <span>PROJECT: {issue.project?.title || 'General'}</span>
+                                                    {issue.dueDate && <span>DUE: {new Date(issue.dueDate).toLocaleDateString()}</span>}
                                                 </div>
                                             </div>
                                         ))}
@@ -373,30 +241,32 @@ const Dashboard = () => {
                             </div>
 
                             {/* Right: Active Projects (3 cols) */}
-                            <div className="lg:col-span-3 bg-card border border-border rounded-2xl p-6 shadow-sm">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="font-bold text-base">Active Projects</h3>
+                            <div className="lg:col-span-3 border border-zinc-800 bg-[#121212] p-5 rounded">
+                                <div className="flex items-center justify-between mb-4 pb-2 border-b border-zinc-800">
+                                    <h3 className="font-mono text-xs uppercase tracking-wider font-semibold text-zinc-300">
+                                        Active Projects
+                                    </h3>
                                     <button 
                                         onClick={() => setActiveSection('projects')}
-                                        className="text-xs text-blue-500 hover:underline flex items-center gap-1 font-medium"
+                                        className="text-xs text-pink-400 hover:underline flex items-center gap-1 font-mono"
                                     >
-                                        View all <ArrowRight className="w-3.5 h-3.5" />
+                                        All <ArrowRight className="w-3 h-3" />
                                     </button>
                                 </div>
 
                                 {activeProjects.length === 0 ? (
-                                    <div className="text-center py-10 text-muted-foreground text-xs">
-                                        No active projects yet.
+                                    <div className="text-center py-10 text-zinc-500 text-xs font-mono">
+                                        No active projects.
                                     </div>
                                 ) : (
-                                    <div className="space-y-3">
+                                    <div className="space-y-2">
                                         {activeProjects.map((p) => (
-                                            <div key={p._id} className="p-3 bg-secondary/40 rounded-xl border border-border">
+                                            <div key={p._id} className="p-3 bg-[#0f0f0f] rounded border border-zinc-800">
                                                 <div className="flex items-center justify-between">
-                                                    <span className="text-xs font-semibold text-foreground">{p.title}</span>
-                                                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                                                    <span className="text-xs font-semibold text-white font-mono">{p.title}</span>
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-pink-500"></span>
                                                 </div>
-                                                <div className="text-[11px] text-muted-foreground mt-1 line-clamp-1">{p.description || 'Active project'}</div>
+                                                <div className="text-[11px] text-zinc-400 mt-1 line-clamp-1">{p.description || 'No description provided'}</div>
                                             </div>
                                         ))}
                                     </div>

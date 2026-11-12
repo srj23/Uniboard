@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
 import {
     User,
     Mail,
@@ -85,30 +84,21 @@ const Profile = () => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Validate file size (512KB max)
-        if (file.size > 512 * 1024) {
-            showMessage('error', 'File size must be less than 512KB');
+        if (file.size > 5 * 1024 * 1024) {
+            showMessage('error', 'Image size must be less than 5MB');
             return;
         }
 
-        // Validate file type
-        if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
-            showMessage('error', 'Only JPG and PNG files are allowed');
-            return;
-        }
+        const uploadFormData = new FormData();
+        uploadFormData.append('avatar', file);
 
         setUploading(true);
-        const formData = new FormData();
-        formData.append('avatar', file);
-
         try {
-            const res = await api.post('/api/users/avatar', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
+            const res = await api.post('/api/users/avatar', uploadFormData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
-            setProfile(res.data.user);
-            showMessage('success', 'Avatar uploaded successfully!');
+            setProfile(prev => prev ? { ...prev, avatar: res.data.avatar } : null);
+            showMessage('success', 'Avatar updated successfully!');
         } catch (err) {
             console.error('Error uploading avatar:', err);
             showMessage('error', 'Failed to upload avatar');
@@ -124,208 +114,165 @@ const Profile = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            </div>
-        );
-    }
-
-    if (!profile) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <p className="text-muted-foreground">Failed to load profile</p>
+            <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+                <Loader2 className="w-6 h-6 animate-spin text-pink-500" />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-background py-12 px-4">
-            {/* Background Gradients */}
-            <div className="fixed inset-0 z-0 pointer-events-none">
-                <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[120px]" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-500/10 rounded-full blur-[120px]" />
-            </div>
+        <div className="min-h-screen bg-[#0a0a0a] text-zinc-100 py-16 px-4 font-sans">
+            <div className="container mx-auto max-w-4xl">
+                {/* Header */}
+                <div className="mb-10 pb-6 border-b border-zinc-800">
+                    <span className="text-xs font-mono uppercase tracking-widest text-pink-500 mb-2 block">// User Settings</span>
+                    <h1 className="text-3xl font-bold font-mono tracking-tight text-white mb-2">
+                        Profile Configuration
+                    </h1>
+                    <p className="text-xs font-mono text-zinc-400">
+                        Manage your identity, bio, and display settings across Issueflow
+                    </p>
+                </div>
 
-            <div className="relative z-10 container mx-auto max-w-4xl">
-                {/* Message Alert */}
                 {message && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className={`mb-6 p-4 rounded-xl border flex items-center gap-3 ${message.type === 'success'
-                                ? 'bg-green-500/10 border-green-500/50 text-green-500'
-                                : 'bg-red-500/10 border-red-500/50 text-red-500'
-                            }`}
+                    <div
+                        className={`mb-6 p-3 rounded border text-xs font-mono flex items-center gap-2 ${
+                            message.type === 'success'
+                                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                                : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                        }`}
                     >
                         {message.type === 'success' ? (
-                            <CheckCircle2 className="w-5 h-5" />
+                            <CheckCircle2 className="w-4 h-4" />
                         ) : (
-                            <AlertCircle className="w-5 h-5" />
+                            <AlertCircle className="w-4 h-4" />
                         )}
-                        <p>{message.text}</p>
-                    </motion.div>
+                        <span>{message.text}</span>
+                    </div>
                 )}
 
-                {/* Profile Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-card border border-border rounded-2xl p-8 mb-6"
-                >
-                    <div className="flex flex-col md:flex-row items-center gap-6">
-                        {/* Avatar */}
-                        <div className="relative group">
-                            <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white text-4xl font-bold">
-                                {profile.avatar ? (
-                                    <img
-                                        src={profile.avatar}
-                                        alt={profile.username}
-                                        className="w-full h-full object-cover"
-                                    />
-                                ) : (
-                                    profile.username.charAt(0).toUpperCase()
-                                )}
+                <div className="grid md:grid-cols-3 gap-6">
+                    {/* Left: Avatar & Meta Card */}
+                    <div className="border border-zinc-800 bg-[#121212] rounded p-6 text-center md:col-span-1 flex flex-col items-center justify-between">
+                        <div className="w-full flex flex-col items-center">
+                            <div className="relative mb-4">
+                                <div className="w-24 h-24 rounded-full overflow-hidden bg-zinc-800 border-2 border-zinc-700 flex items-center justify-center text-pink-400 text-3xl font-mono font-bold">
+                                    {profile?.avatar ? (
+                                        <img
+                                            src={profile.avatar}
+                                            alt={profile.username}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        profile?.username?.charAt(0).toUpperCase()
+                                    )}
+                                </div>
+                                <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    disabled={uploading}
+                                    className="absolute bottom-0 right-0 p-2 rounded-full bg-pink-500 hover:bg-pink-400 text-black shadow transition-colors"
+                                    title="Upload Avatar"
+                                >
+                                    {uploading ? (
+                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                    ) : (
+                                        <Camera className="w-3.5 h-3.5" />
+                                    )}
+                                </button>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleAvatarUpload}
+                                    className="hidden"
+                                />
                             </div>
-                            <button
-                                onClick={() => fileInputRef.current?.click()}
-                                disabled={uploading}
-                                className="absolute bottom-0 right-0 p-3 bg-primary text-primary-foreground rounded-full hover:opacity-90 transition-opacity shadow-lg disabled:opacity-50"
-                            >
-                                {uploading ? (
-                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                ) : (
-                                    <Camera className="w-5 h-5" />
-                                )}
-                            </button>
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept="image/jpeg,image/jpg,image/png"
-                                onChange={handleAvatarUpload}
-                                className="hidden"
-                            />
+
+                            <h3 className="font-mono font-bold text-base text-white">
+                                {profile?.displayName || profile?.username}
+                            </h3>
+                            <p className="text-xs font-mono text-zinc-500 mt-0.5">@{profile?.username}</p>
                         </div>
 
-                        {/* User Info */}
-                        <div className="flex-1 text-center md:text-left">
-                            <h1 className="text-3xl font-bold mb-2">
-                                {profile.displayName || profile.username}
-                            </h1>
-                            <div className="flex flex-col md:flex-row gap-4 text-muted-foreground">
-                                <div className="flex items-center gap-2 justify-center md:justify-start">
-                                    <User className="w-4 h-4" />
-                                    <span className="text-sm">@{profile.username}</span>
-                                </div>
-                                <div className="flex items-center gap-2 justify-center md:justify-start">
-                                    <Mail className="w-4 h-4" />
-                                    <span className="text-sm">{profile.email}</span>
-                                </div>
-                                {profile.location && (
-                                    <div className="flex items-center gap-2 justify-center md:justify-start">
-                                        <MapPin className="w-4 h-4" />
-                                        <span className="text-sm">{profile.location}</span>
-                                    </div>
-                                )}
+                        <div className="w-full pt-4 mt-6 border-t border-zinc-800 text-left space-y-2 text-xs font-mono text-zinc-400">
+                            <div className="flex items-center gap-2">
+                                <Mail className="w-3.5 h-3.5 text-zinc-500" />
+                                <span className="truncate">{profile?.email}</span>
                             </div>
-                            <div className="flex items-center gap-2 mt-3 text-muted-foreground justify-center md:justify-start">
-                                <Calendar className="w-4 h-4" />
-                                <span className="text-sm">
-                                    Joined {new Date(profile.createdAt).toLocaleDateString('en-US', {
-                                        month: 'long',
-                                        year: 'numeric'
-                                    })}
-                                </span>
+                            <div className="flex items-center gap-2">
+                                <Calendar className="w-3.5 h-3.5 text-zinc-500" />
+                                <span>Joined {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString() : 'Recently'}</span>
                             </div>
                         </div>
                     </div>
-                </motion.div>
 
-                {/* Edit Profile Form */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="bg-card border border-border rounded-2xl p-8"
-                >
-                    <h2 className="text-2xl font-bold mb-6">Edit Profile</h2>
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div>
-                            <label htmlFor="displayName" className="block text-sm font-medium mb-2">
-                                Display Name
-                            </label>
-                            <input
-                                type="text"
-                                id="displayName"
-                                name="displayName"
-                                value={formData.displayName}
-                                onChange={handleInputChange}
-                                placeholder="Your display name"
-                                className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-                            />
-                        </div>
+                    {/* Right: Profile Edit Form */}
+                    <div className="border border-zinc-800 bg-[#121212] rounded p-6 md:col-span-2">
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-mono text-zinc-400 mb-1">Display Name</label>
+                                <div className="relative">
+                                    <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
+                                    <input
+                                        type="text"
+                                        name="displayName"
+                                        value={formData.displayName}
+                                        onChange={handleInputChange}
+                                        placeholder="Your full name or handle"
+                                        className="w-full pl-8 pr-3 py-2 bg-[#0a0a0a] border border-zinc-800 rounded text-xs font-mono text-white outline-none focus:border-pink-500"
+                                    />
+                                </div>
+                            </div>
 
-                        <div>
-                            <label htmlFor="location" className="block text-sm font-medium mb-2">
-                                Location
-                            </label>
-                            <input
-                                type="text"
-                                id="location"
-                                name="location"
-                                value={formData.location}
-                                onChange={handleInputChange}
-                                placeholder="Your location"
-                                className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-                            />
-                        </div>
+                            <div>
+                                <label className="block text-xs font-mono text-zinc-400 mb-1">Location</label>
+                                <div className="relative">
+                                    <MapPin className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
+                                    <input
+                                        type="text"
+                                        name="location"
+                                        value={formData.location}
+                                        onChange={handleInputChange}
+                                        placeholder="City, Country"
+                                        className="w-full pl-8 pr-3 py-2 bg-[#0a0a0a] border border-zinc-800 rounded text-xs font-mono text-white outline-none focus:border-pink-500"
+                                    />
+                                </div>
+                            </div>
 
-                        <div>
-                            <label htmlFor="bio" className="block text-sm font-medium mb-2">
-                                Bio
-                            </label>
-                            <textarea
-                                id="bio"
-                                name="bio"
-                                value={formData.bio}
-                                onChange={handleInputChange}
-                                placeholder="Tell us about yourself..."
-                                rows={4}
-                                className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all resize-none"
-                            />
-                        </div>
+                            <div>
+                                <label className="block text-xs font-mono text-zinc-400 mb-1">Developer Bio</label>
+                                <textarea
+                                    name="bio"
+                                    rows={4}
+                                    value={formData.bio}
+                                    onChange={handleInputChange}
+                                    placeholder="Tell the team about your stack and focus areas..."
+                                    className="w-full px-3 py-2 bg-[#0a0a0a] border border-zinc-800 rounded text-xs font-mono text-white outline-none focus:border-pink-500"
+                                />
+                            </div>
 
-                        <button
-                            type="submit"
-                            disabled={saving}
-                            className="w-full md:w-auto px-8 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
-                        >
-                            {saving ? (
-                                <>
-                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                    Saving...
-                                </>
-                            ) : (
-                                <>
-                                    <Save className="w-5 h-5" />
-                                    Save Changes
-                                </>
-                            )}
-                        </button>
-                    </form>
-                </motion.div>
-
-                {/* Additional Info */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="mt-6 p-4 bg-blue-500/10 border border-blue-500/50 rounded-xl"
-                >
-                    <p className="text-sm text-blue-400">
-                        <strong>Note:</strong> Avatar images must be JPG or PNG format and less than 512KB in size.
-                    </p>
-                </motion.div>
+                            <div className="pt-2 flex justify-end">
+                                <button
+                                    type="submit"
+                                    disabled={saving}
+                                    className="px-5 py-2 bg-pink-500 hover:bg-pink-400 text-black font-semibold text-xs font-mono rounded transition-colors flex items-center gap-1.5"
+                                >
+                                    {saving ? (
+                                        <>
+                                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                            Saving...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Save className="w-3.5 h-3.5" />
+                                            Save Changes
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     );

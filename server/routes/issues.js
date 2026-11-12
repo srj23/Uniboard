@@ -129,9 +129,9 @@ router.put('/:id', verifyToken, async (req, res) => {
         const issue = await Issue.findById(req.params.id);
         if (!issue) return res.status(404).json("Issue not found");
 
-        // If user is 'others', they have no access to issues
+        // If user is 'others', they have viewer-only access
         if (currentUser.role === 'others') {
-            return res.status(403).json("Users with 'others' role only have access to whiteboards.");
+            return res.status(403).json("Users with 'others' role have read-only access. Contact an admin to become a team member.");
         }
 
         // Role-based permissions:

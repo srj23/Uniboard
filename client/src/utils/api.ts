@@ -2,7 +2,7 @@ import axios from "axios";
 import { appConfig } from "../config";
 
 const api = axios.create({
-    baseURL: appConfig.API_URL || "https://uniboard-backend.nexinlabs.tech/",
+    baseURL: appConfig.API_URL || "https://issueflow-backend.nexinlabs.tech/",
     headers: {
         "Content-Type": "application/json",
     },

@@ -1,12 +1,8 @@
-import { motion } from 'framer-motion';
 import {
     Target,
     Eye,
-    Heart,
     Shield,
-    Sparkles,
     Award,
-    PenTool,
     KanbanSquare,
     Layers,
     Users
@@ -15,203 +11,117 @@ import { Link } from 'react-router-dom';
 
 const About = () => {
     const stats = [
-        { label: 'Whiteboards Created', value: '50K+', icon: Layers },
-        { label: 'Issues Resolved', value: '160K+', icon: KanbanSquare },
-        { label: 'Active Teams', value: '10K+', icon: Users },
-        { label: 'Attendance Verified', value: '99.9%', icon: Award }
+        { label: 'PROJECTS_TRACKED', value: '12K+', icon: Layers },
+        { label: 'ISSUES_RESOLVED', value: '160K+', icon: KanbanSquare },
+        { label: 'ACTIVE_DEVELOPERS', value: '10K+', icon: Users },
+        { label: 'ATTENDANCE_ACCURACY', value: '99.9%', icon: Award }
     ];
 
     const values = [
         {
             icon: Target,
-            title: 'Unified Flow',
-            description: 'Bridging visual brainstorming directly with deliverable execution. Ideas created on the whiteboard turn into trackable issues seamlessly.',
-            gradient: 'from-blue-400 to-cyan-400'
+            title: 'Zero Overhead',
+            description: 'No 30-field forms to file a bug. Just an issue code, title, project, priority, and an assignee.'
         },
         {
             icon: Eye,
-            title: 'Transparent Merit',
-            description: 'Automated performance and attendance tracking that gives genuine credit to developers for resolved tasks and admins for proactive management.',
-            gradient: 'from-purple-400 to-pink-400'
-        },
-        {
-            icon: Heart,
-            title: 'Collaborative Freedom',
-            description: 'Simplicity and speed for everyone. Whether sketcher, engineer, or team lead, Uniboard provides an open canvas with zero friction.',
-            gradient: 'from-emerald-400 to-teal-400'
-        }
-    ];
-
-    const features = [
-        {
-            icon: PenTool,
-            title: 'Real-Time Multiplayer Canvas',
-            description: 'Draw shapes, connect ideas, attach notes, and collaborate across borders using low-latency WebSockets.'
-        },
-        {
-            icon: KanbanSquare,
-            title: 'IssueFlow Engine',
-            description: 'Organize project deliverables, track priorities, filter sprints, and resolve technical bugs with clear accountability.'
-        },
-        {
-            icon: Award,
-            title: 'Automated Attendance System',
-            description: 'Gain verifiable attendance credits whenever you assign tasks as an Admin or resolve tickets as a Team Member.'
+            title: 'Verifiable Merit',
+            description: 'Automated performance points recorded only when tickets move across the resolution line.'
         },
         {
             icon: Shield,
-            title: 'Role-Based Governance',
-            description: 'Granular permissions tailored for Admins, Team Members, and Guests with JWT authentication and protected endpoints.'
+            title: 'Clean Permissions',
+            description: 'Strict role gates prevent team members from stepping on admin settings, preserving audit trails.'
         }
     ];
 
     return (
-        <div className="min-h-screen bg-background py-16 px-4">
-            {/* Background Gradients */}
-            <div className="fixed inset-0 z-0 pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[45%] h-[45%] bg-blue-500/10 rounded-full blur-[140px]" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[45%] h-[45%] bg-purple-500/10 rounded-full blur-[140px]" />
-            </div>
-
-            <div className="relative z-10 container mx-auto max-w-6xl">
+        <div className="min-h-screen bg-[#0a0a0a] text-zinc-100 py-16 px-4 font-sans">
+            <div className="container mx-auto max-w-5xl">
                 {/* Hero Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-center mb-16"
-                >
-                    <div className="inline-flex items-center px-4 py-1.5 rounded-full border border-blue-500/20 bg-blue-500/10 backdrop-blur-sm text-xs font-semibold text-blue-400 mb-6">
-                        <Sparkles className="w-4 h-4 mr-2" />
-                        About Uniboard Workspace
-                    </div>
-
-                    <h1 className="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">
-                        Revolutionizing How Teams <br />
-                        <span className="bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 bg-clip-text text-transparent">
-                            Sketch, Track & Deliver
-                        </span>
+                <div className="mb-16 pb-8 border-b border-zinc-800">
+                    <span className="text-xs font-mono uppercase tracking-widest text-pink-500 mb-2 block">// About</span>
+                    <h1 className="text-3xl sm:text-5xl font-bold font-mono tracking-tight text-white mb-4">
+                        Architecture & Purpose
                     </h1>
-                    <p className="text-base md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                        Uniboard unites real-time collaborative whiteboards, comprehensive issue tracking, and an automated attendance system into a single cohesive ecosystem.
+                    <p className="text-sm sm:text-base text-zinc-400 max-w-2xl leading-relaxed">
+                        Issueflow was engineered to replace slow, heavy enterprise project trackers with a lightweight, high-contrast system designed for daily developer sprints.
                     </p>
-                </motion.div>
+                </div>
 
                 {/* Stats Grid */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-20"
-                >
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-16">
                     {stats.map((stat, index) => (
                         <div
                             key={index}
-                            className="p-6 rounded-2xl bg-card border border-border text-center hover:border-primary/50 transition-all shadow-sm"
+                            className="p-4 rounded border border-zinc-800 bg-[#121212]"
                         >
-                            <stat.icon className="w-6 h-6 mx-auto mb-3 text-primary" />
-                            <div className="text-2xl sm:text-3xl font-extrabold mb-1">{stat.value}</div>
-                            <div className="text-xs text-muted-foreground font-medium">{stat.label}</div>
+                            <stat.icon className="w-4 h-4 mb-2 text-pink-500" />
+                            <div className="text-xl font-bold font-mono text-white mb-0.5">{stat.value}</div>
+                            <div className="text-[10px] font-mono text-zinc-500">{stat.label}</div>
                         </div>
                     ))}
-                </motion.div>
+                </div>
 
-                {/* Our Mission & Values */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="mb-20"
-                >
-                    <h2 className="text-2xl sm:text-3xl font-extrabold text-center mb-12">
-                        Core Principles Driving Uniboard
-                    </h2>
-                    <div className="grid md:grid-cols-3 gap-6">
+                {/* Principles */}
+                <div className="mb-16">
+                    <h2 className="text-lg font-bold font-mono text-white mb-6">Design Principles</h2>
+                    <div className="grid md:grid-cols-3 gap-4">
                         {values.map((value, index) => (
                             <div
                                 key={index}
-                                className="p-8 rounded-3xl bg-card border border-border hover:border-primary/50 transition-all shadow-sm flex flex-col justify-between"
+                                className="p-5 rounded border border-zinc-800 bg-[#121212]"
                             >
-                                <div>
-                                    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${value.gradient} flex items-center justify-center mb-6`}>
-                                        <value.icon className="w-6 h-6 text-white" />
-                                    </div>
-                                    <h3 className="text-xl font-bold mb-3">{value.title}</h3>
-                                    <p className="text-sm text-muted-foreground leading-relaxed">{value.description}</p>
+                                <div className="w-8 h-8 rounded bg-zinc-800 border border-zinc-700 text-pink-400 flex items-center justify-center mb-4">
+                                    <value.icon className="w-4 h-4" />
                                 </div>
+                                <h3 className="text-sm font-semibold font-mono text-white mb-2">{value.title}</h3>
+                                <p className="text-xs text-zinc-400 leading-relaxed">{value.description}</p>
                             </div>
                         ))}
                     </div>
-                </motion.div>
+                </div>
 
-                {/* Story Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="p-8 sm:p-12 rounded-3xl bg-card/70 border border-border backdrop-blur-md mb-20 shadow-sm"
-                >
-                    <h2 className="text-2xl sm:text-3xl font-extrabold mb-6">The Uniboard Story</h2>
-                    <div className="space-y-4 text-sm sm:text-base text-muted-foreground leading-relaxed">
-                        <p>
-                            Modern engineering and design teams often face a disconnect: creative diagrams happen in one whiteboard app, tasks are scattered across a complex issue tracker, and attendance/performance logging is handled in another outdated spreadsheet.
-                        </p>
-                        <p>
-                            We built <strong>Uniboard</strong> to solve this fragmentation. By bridging infinite collaborative canvases with an intuitive IssueFlow pipeline, tasks flow naturally from conception to resolution.
-                        </p>
-                        <p>
-                            With our automated attendance ledger, every deliverable resolved and every sprint managed translates directly into verifiable performance points—rewarding high-performing team members and proactive leaders.
-                        </p>
+                {/* Tech Stack Spec */}
+                <div className="p-6 rounded border border-zinc-800 bg-[#121212] mb-16">
+                    <h2 className="text-base font-bold font-mono text-white mb-4">System Architecture</h2>
+                    <div className="space-y-2 text-xs font-mono text-zinc-400">
+                        <div className="flex justify-between py-1.5 border-b border-zinc-800">
+                            <span className="text-zinc-500">BACKEND_RUNTIME</span>
+                            <span className="text-zinc-200">Node.js + Express (Port 5001)</span>
+                        </div>
+                        <div className="flex justify-between py-1.5 border-b border-zinc-800">
+                            <span className="text-zinc-500">DATABASE</span>
+                            <span className="text-zinc-200">MongoDB with Mongoose ODM</span>
+                        </div>
+                        <div className="flex justify-between py-1.5 border-b border-zinc-800">
+                            <span className="text-zinc-500">REALTIME_TRANSPORT</span>
+                            <span className="text-zinc-200">Socket.IO Rooms per Project</span>
+                        </div>
+                        <div className="flex justify-between py-1.5 border-b border-zinc-800">
+                            <span className="text-zinc-500">AUTH_MECHANISM</span>
+                            <span className="text-zinc-200">JWT (Header Bearer) + bcrypt Password Hashing</span>
+                        </div>
+                        <div className="flex justify-between py-1.5">
+                            <span className="text-zinc-500">FRONTEND_STACK</span>
+                            <span className="text-zinc-200">React + TypeScript + Vite + Tailwind CSS</span>
+                        </div>
                     </div>
-                </motion.div>
+                </div>
 
-                {/* Features Grid */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    className="mb-20"
-                >
-                    <h2 className="text-2xl sm:text-3xl font-extrabold text-center mb-12">
-                        Built For High-Velocity Teams
-                    </h2>
-                    <div className="grid md:grid-cols-2 gap-6">
-                        {features.map((feature, index) => (
-                            <div
-                                key={index}
-                                className="p-6 rounded-2xl bg-card border border-border hover:border-primary/50 transition-all shadow-sm"
-                            >
-                                <div className="flex items-start gap-4">
-                                    <div className="p-3 rounded-xl bg-primary/10 text-primary">
-                                        <feature.icon className="w-6 h-6" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-semibold text-base mb-1.5">{feature.title}</h3>
-                                        <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                {/* CTA */}
+                <div className="p-6 border border-zinc-800 bg-[#121212] rounded flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div>
+                        <h3 className="font-mono font-bold text-white text-sm">Deploy or test locally</h3>
+                        <p className="text-xs text-zinc-500 font-mono">Create an account to explore the dashboard.</p>
                     </div>
-                </motion.div>
-
-                {/* Call to Action Box */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6 }}
-                    className="p-8 sm:p-12 rounded-3xl bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-emerald-600/10 border border-border text-center shadow-lg"
-                >
-                    <h2 className="text-2xl sm:text-3xl font-extrabold mb-3">Ready to Transform Your Workflow?</h2>
-                    <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto mb-6">
-                        Join teams organizing their visual ideas, task pipelines, and attendance tracking on Uniboard.
-                    </p>
                     <Link
                         to="/register"
-                        className="inline-flex items-center px-8 py-3.5 bg-primary text-primary-foreground font-semibold rounded-2xl hover:opacity-95 transition-all shadow-lg text-sm"
+                        className="px-5 py-2.5 bg-pink-500 hover:bg-pink-400 text-black font-semibold text-xs font-mono rounded"
                     >
-                        Get Started with Uniboard
+                        Sign Up Now
                     </Link>
-                </motion.div>
+                </div>
             </div>
         </div>
     );
