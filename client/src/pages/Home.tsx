@@ -13,49 +13,72 @@ import {
     Layers,
     Terminal,
     ArrowUpRight,
-    GitBranch,
-    GitCommit,
     Check,
-    Flame,
-    Cpu
+    Sparkles,
+    Award
 } from 'lucide-react';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 
-// Mock stream events for interactive tech reactor terminal
-const TECH_EVENTS = [
-    { id: '1', code: 'IF-108', msg: 'POST /api/issues -> Assigned to @partha', status: 'IN_PROGRESS', time: '12ms' },
-    { id: '2', code: 'IF-104', msg: 'JWT signature verified for role:admin', status: 'AUTH_OK', time: '4ms' },
-    { id: '3', code: 'IF-099', msg: 'Status updated -> resolved (1.2h duration)', status: 'RESOLVED', time: '18ms' },
-    { id: '4', code: 'IF-102', msg: 'Socket.IO broadcast: room:project-01', status: 'SYNCED', time: '2ms' },
-    { id: '5', code: 'IF-107', msg: 'Attendance ledger: +1 credit logged in MongoDB', status: 'CREDITED', time: '9ms' }
+// Simple, human-friendly task cards that everyone understands
+const SAMPLE_CARDS = [
+    {
+        id: '1',
+        title: 'Fix mobile navigation menu',
+        stage: 'In Progress',
+        stageColor: 'text-pink-400 bg-pink-500/10 border-pink-500/30',
+        assignee: 'Sarah Miller',
+        avatarText: 'SM',
+        note: 'Testing on iPhone and Android screens',
+        time: 'Updated 2 mins ago'
+    },
+    {
+        id: '2',
+        title: 'Design clean sign-in screen',
+        stage: 'Resolved',
+        stageColor: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
+        assignee: 'Alex Chen',
+        avatarText: 'AC',
+        note: 'Completed on time • Attendance credit awarded',
+        time: 'Completed today'
+    },
+    {
+        id: '3',
+        title: 'Update monthly pricing plans',
+        stage: 'New Task',
+        stageColor: 'text-amber-400 bg-amber-500/10 border-amber-500/30',
+        assignee: 'David Patel',
+        avatarText: 'DP',
+        note: 'Assigned by team admin with high priority',
+        time: 'Assigned 1 hour ago'
+    }
 ];
 
 const Home = () => {
     const { user } = useContext(AuthContext);
-    const [eventIndex, setEventIndex] = useState(0);
+    const [cardIndex, setCardIndex] = useState(0);
 
-    // Live pipeline pulse ticker
+    // Automatically transition through sample tasks
     useEffect(() => {
         const interval = setInterval(() => {
-            setEventIndex((prev) => (prev + 1) % TECH_EVENTS.length);
-        }, 2200);
+            setCardIndex((prev) => (prev + 1) % SAMPLE_CARDS.length);
+        }, 3000);
         return () => clearInterval(interval);
     }, []);
 
-    const currentEvent = TECH_EVENTS[eventIndex];
+    const activeCard = SAMPLE_CARDS[cardIndex];
 
     return (
         <div className="min-h-screen bg-[#0a0a0a] text-zinc-100 selection:bg-pink-500 selection:text-black">
             <div className="container mx-auto px-4 py-10 md:py-16 max-w-6xl">
-                {/* HERO SECTION WITH ANIMATED INTERACTIVE TECH CONSOLE */}
+                {/* HERO SECTION WITH SIMPLE VISUAL TASK BOARD */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-20">
                     {/* Left Column (7 cols): Main Headline & CTA */}
                     <div className="lg:col-span-7">
                         {/* Badge */}
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded border border-pink-500/30 bg-pink-500/10 text-pink-400 text-xs font-medium mb-6">
                             <Terminal className="w-3.5 h-3.5" />
-                            Simple Issue & Sprint Tracker
+                            Simple Issue & Task Tracker
                         </div>
 
                         {/* Main Headline */}
@@ -66,7 +89,7 @@ const Home = () => {
 
                         {/* Subheading */}
                         <p className="text-base sm:text-lg text-zinc-400 mb-8 max-w-xl leading-relaxed">
-                            A focused issue and task manager for teams that value speed. Simple status transitions, verified completion timestamps, and role-based delegation without bloated enterprise dashboards.
+                            A straightforward way for teams to assign tasks, follow progress, and automatically reward members when work gets completed.
                         </p>
 
                         {/* CTA Buttons */}
@@ -100,127 +123,113 @@ const Home = () => {
                                 to="/about"
                                 className="px-4 py-3 text-zinc-400 hover:text-pink-400 text-xs font-mono transition-colors flex items-center gap-1"
                             >
-                                Read architecture notes <ArrowUpRight className="w-3.5 h-3.5" />
+                                Read how it works <ArrowUpRight className="w-3.5 h-3.5" />
                             </Link>
                         </div>
                     </div>
 
-                    {/* Right Column (5 cols): Futuristic Reactive Technology Console */}
+                    {/* Right Column (5 cols): Clean, Simple Task Preview Card */}
                     <div className="lg:col-span-5 relative">
-                        {/* Subtle Pink Ambient Reactor Glow */}
-                        <div className="absolute -inset-1 bg-gradient-to-r from-pink-500/20 via-pink-500/10 to-transparent rounded-lg blur-xl pointer-events-none" />
+                        {/* Soft background glow */}
+                        <div className="absolute -inset-1 bg-pink-500/15 rounded-xl blur-lg pointer-events-none" />
 
-                        {/* Outer Frame */}
-                        <div className="relative border border-zinc-800 bg-[#0e0e0e] rounded-lg overflow-hidden shadow-2xl">
-                            {/* Terminal Top Window Controls */}
-                            <div className="px-4 py-2.5 bg-[#141414] border-b border-zinc-800 flex items-center justify-between text-xs font-mono">
+                        <div className="relative border border-zinc-800 bg-[#121212] rounded-xl overflow-hidden shadow-2xl p-5">
+                            {/* Card Header */}
+                            <div className="flex items-center justify-between pb-3.5 border-b border-zinc-800">
                                 <div className="flex items-center gap-2">
-                                    <div className="flex gap-1.5">
-                                        <span className="w-2.5 h-2.5 rounded-full bg-zinc-700 block"></span>
-                                        <span className="w-2.5 h-2.5 rounded-full bg-zinc-700 block"></span>
-                                        <span className="w-2.5 h-2.5 rounded-full bg-pink-500 block animate-pulse"></span>
-                                    </div>
-                                    <span className="text-zinc-400 text-[11px] font-semibold ml-2">issueflow.engine</span>
+                                    <span className="w-2.5 h-2.5 rounded-full bg-pink-500 inline-block animate-pulse"></span>
+                                    <span className="text-xs font-bold text-white tracking-wide">Live Team Activity</span>
                                 </div>
-                                <div className="flex items-center gap-2 text-[10px] text-pink-400">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-ping"></span>
-                                    <span>WEBSOCKET: ACTIVE</span>
-                                </div>
+                                <span className="text-[11px] text-zinc-400 flex items-center gap-1">
+                                    <Sparkles className="w-3 h-3 text-pink-400" />
+                                    Real-time
+                                </span>
                             </div>
 
-                            {/* Animated Pipeline Stage Flow Visualizer */}
-                            <div className="p-5 border-b border-zinc-800 bg-[#0d0d0d]">
-                                <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 mb-3">
-                                    <span className="flex items-center gap-1.5 text-zinc-300">
-                                        <Cpu className="w-3.5 h-3.5 text-pink-500" />
-                                        LIVE_PIPELINE_ORCHESTRATOR
-                                    </span>
-                                    <span className="text-pink-400 font-bold">120 FPS</span>
-                                </div>
-
-                                {/* Multi-Stage Circuit Nodes */}
-                                <div className="grid grid-cols-3 gap-2">
-                                    <motion.div
-                                        animate={{ borderColor: eventIndex === 0 ? '#f43f8e' : '#27272a' }}
-                                        className="p-2.5 rounded bg-[#161616] border border-zinc-800 text-center"
-                                    >
-                                        <div className="text-[10px] font-mono text-zinc-500 mb-1">01_INGEST</div>
-                                        <div className="text-xs font-mono font-bold text-white flex items-center justify-center gap-1">
-                                            <GitBranch className="w-3 h-3 text-pink-400" /> OPEN
-                                        </div>
-                                    </motion.div>
-
-                                    <motion.div
-                                        animate={{ borderColor: eventIndex === 1 || eventIndex === 2 ? '#f43f8e' : '#27272a' }}
-                                        className="p-2.5 rounded bg-[#161616] border border-zinc-800 text-center"
-                                    >
-                                        <div className="text-[10px] font-mono text-zinc-500 mb-1">02_SPRINT</div>
-                                        <div className="text-xs font-mono font-bold text-white flex items-center justify-center gap-1">
-                                            <Flame className="w-3 h-3 text-pink-400" /> ACTIVE
-                                        </div>
-                                    </motion.div>
-
-                                    <motion.div
-                                        animate={{ borderColor: eventIndex >= 3 ? '#f43f8e' : '#27272a' }}
-                                        className="p-2.5 rounded bg-[#161616] border border-zinc-800 text-center"
-                                    >
-                                        <div className="text-[10px] font-mono text-zinc-500 mb-1">03_VERIFY</div>
-                                        <div className="text-xs font-mono font-bold text-white flex items-center justify-center gap-1">
-                                            <Check className="w-3 h-3 text-emerald-400" /> CREDITED
-                                        </div>
-                                    </motion.div>
-                                </div>
+                            {/* 3 Step Workflow Tabs */}
+                            <div className="grid grid-cols-3 gap-2 my-4">
+                                <button
+                                    onClick={() => setCardIndex(2)}
+                                    className={`py-2 px-1 text-center rounded border transition-colors ${
+                                        cardIndex === 2 
+                                            ? 'border-pink-500 bg-pink-500/10 text-white font-semibold' 
+                                            : 'border-zinc-800 bg-[#181818] text-zinc-400 hover:text-zinc-200'
+                                    }`}
+                                >
+                                    <div className="text-[10px] text-zinc-500">Step 1</div>
+                                    <div className="text-xs">New Tasks</div>
+                                </button>
+                                <button
+                                    onClick={() => setCardIndex(0)}
+                                    className={`py-2 px-1 text-center rounded border transition-colors ${
+                                        cardIndex === 0 
+                                            ? 'border-pink-500 bg-pink-500/10 text-white font-semibold' 
+                                            : 'border-zinc-800 bg-[#181818] text-zinc-400 hover:text-zinc-200'
+                                    }`}
+                                >
+                                    <div className="text-[10px] text-zinc-500">Step 2</div>
+                                    <div className="text-xs">In Progress</div>
+                                </button>
+                                <button
+                                    onClick={() => setCardIndex(1)}
+                                    className={`py-2 px-1 text-center rounded border transition-colors ${
+                                        cardIndex === 1 
+                                            ? 'border-pink-500 bg-pink-500/10 text-white font-semibold' 
+                                            : 'border-zinc-800 bg-[#181818] text-zinc-400 hover:text-zinc-200'
+                                    }`}
+                                >
+                                    <div className="text-[10px] text-zinc-500">Step 3</div>
+                                    <div className="text-xs">Done</div>
+                                </button>
                             </div>
 
-                            {/* Dynamic Real-Time Ticker Feed */}
-                            <div className="p-4 space-y-2 bg-[#090909] font-mono text-xs">
-                                <div className="text-[10px] text-zinc-500 uppercase tracking-wider mb-2 flex items-center justify-between">
-                                    <span>Incoming Event Bus</span>
-                                    <span className="text-zinc-400">SYNC_LATENCY: 4ms</span>
-                                </div>
-
+                            {/* Animated Task Card Container */}
+                            <div className="min-h-[140px] flex items-center justify-center">
                                 <AnimatePresence mode="wait">
                                     <motion.div
-                                        key={currentEvent.id}
-                                        initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                                        key={activeCard.id}
+                                        initial={{ opacity: 0, y: 8, scale: 0.98 }}
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{ opacity: 0, y: -10, scale: 0.98 }}
+                                        exit={{ opacity: 0, y: -8, scale: 0.98 }}
                                         transition={{ duration: 0.25 }}
-                                        className="p-3 rounded border border-pink-500/40 bg-pink-500/5 shadow-inner"
+                                        className="w-full bg-[#181818] border border-zinc-700/60 rounded-lg p-4 shadow-sm"
                                     >
-                                        <div className="flex items-center justify-between mb-1">
-                                            <span className="font-bold text-pink-400">{currentEvent.code}</span>
-                                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 font-semibold">
-                                                {currentEvent.status}
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-xs font-semibold text-white">
+                                                {activeCard.title}
+                                            </span>
+                                            <span className={`text-[11px] px-2 py-0.5 rounded border font-medium ${activeCard.stageColor}`}>
+                                                {activeCard.stage}
                                             </span>
                                         </div>
-                                        <div className="text-zinc-200 text-xs truncate">{currentEvent.msg}</div>
-                                        <div className="mt-1.5 flex items-center justify-between text-[10px] text-zinc-500">
-                                            <span>PROCESSED IN {currentEvent.time}</span>
-                                            <span className="text-pink-400">VERIFIED ✓</span>
+
+                                        <p className="text-xs text-zinc-400 mb-3">
+                                            {activeCard.note}
+                                        </p>
+
+                                        <div className="flex items-center justify-between pt-2.5 border-t border-zinc-800 text-xs">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-6 h-6 rounded-full bg-pink-500 text-black flex items-center justify-center font-bold text-[10px]">
+                                                    {activeCard.avatarText}
+                                                </div>
+                                                <span className="text-zinc-300 font-medium">{activeCard.assignee}</span>
+                                            </div>
+                                            <span className="text-[11px] text-zinc-500">{activeCard.time}</span>
                                         </div>
                                     </motion.div>
                                 </AnimatePresence>
-
-                                {/* Background Stream Log Lines */}
-                                <div className="pt-2 border-t border-zinc-800/80 space-y-1 text-[11px] text-zinc-500">
-                                    <div className="flex items-center gap-2">
-                                        <GitCommit className="w-3 h-3 text-zinc-600" />
-                                        <span className="text-zinc-400">[git:sha]</span>
-                                        <span className="text-zinc-600 truncate">b765e69: issue state transition engine</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Activity className="w-3 h-3 text-zinc-600" />
-                                        <span className="text-zinc-400">[mongo]</span>
-                                        <span className="text-zinc-600 truncate">atomic $inc attendanceCount + 1</span>
-                                    </div>
-                                </div>
                             </div>
 
-                            {/* Bottom Status Ticker Bar */}
-                            <div className="px-4 py-2 bg-[#121212] border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono text-zinc-400">
-                                <span>STATUS: CLUSTER_READY</span>
-                                <span className="text-pink-400 font-bold">ZERO_DATA_LOSS</span>
+                            {/* Bottom Helper Points */}
+                            <div className="mt-4 pt-3 border-t border-zinc-800 space-y-1.5 text-xs text-zinc-400">
+                                <div className="flex items-center gap-2">
+                                    <Check className="w-3.5 h-3.5 text-pink-500 shrink-0" />
+                                    <span>Assign tasks to team members in one click</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Award className="w-3.5 h-3.5 text-pink-500 shrink-0" />
+                                    <span>Team members automatically earn attendance when tasks are done</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -230,29 +239,29 @@ const Home = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-20">
                     <div className="border border-zinc-800 bg-[#121212] p-5 rounded">
                         <div className="flex items-center justify-between text-zinc-400 mb-3">
-                            <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">01 / Scope</span>
+                            <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">01 / Projects</span>
                             <Layers className="w-4 h-4 text-pink-500" />
                         </div>
                         <h3 className="text-lg font-bold text-white mb-1">Project Workspaces</h3>
-                        <p className="text-xs text-zinc-400 leading-relaxed">Group tasks under specific initiatives with deadlines and milestone tracking.</p>
+                        <p className="text-xs text-zinc-400 leading-relaxed">Group tasks under specific projects with clear goals and due dates.</p>
                     </div>
 
                     <div className="border border-zinc-800 bg-[#121212] p-5 rounded">
                         <div className="flex items-center justify-between text-zinc-400 mb-3">
-                            <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">02 / Execution</span>
+                            <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">02 / Clear Flow</span>
                             <KanbanSquare className="w-4 h-4 text-pink-500" />
                         </div>
-                        <h3 className="text-lg font-bold text-white mb-1">Strict Lifecycle</h3>
-                        <p className="text-xs text-zinc-400 leading-relaxed">Predictable progression: Open ➔ In Progress ➔ Resolved ➔ Closed.</p>
+                        <h3 className="text-lg font-bold text-white mb-1">Simple Stages</h3>
+                        <p className="text-xs text-zinc-400 leading-relaxed">Follow tasks easily: Open ➔ In Progress ➔ Resolved ➔ Closed.</p>
                     </div>
 
                     <div className="border border-zinc-800 bg-[#121212] p-5 rounded">
                         <div className="flex items-center justify-between text-zinc-400 mb-3">
-                            <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">03 / Attribution</span>
+                            <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">03 / Recognition</span>
                             <Activity className="w-4 h-4 text-pink-500" />
                         </div>
-                        <h3 className="text-lg font-bold text-white mb-1">Attendance Ledger</h3>
-                        <p className="text-xs text-zinc-400 leading-relaxed">Automated timestamps & credits when engineers push deliverables across the line.</p>
+                        <h3 className="text-lg font-bold text-white mb-1">Attendance Credits</h3>
+                        <p className="text-xs text-zinc-400 leading-relaxed">Get recognized and earn points automatically when you complete tasks.</p>
                     </div>
                 </div>
 
@@ -288,7 +297,7 @@ const Home = () => {
                                     <span className="text-xs font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-200 border border-zinc-700">MEMBER</span>
                                     <Users className="w-4 h-4 text-zinc-400" />
                                 </div>
-                                <h4 className="text-base font-semibold text-white mb-2">Software Engineer</h4>
+                                <h4 className="text-base font-semibold text-white mb-2">Team Member</h4>
                                 <p className="text-xs text-zinc-400 leading-relaxed mb-4">
                                     View assigned tickets, update state to In-Progress during active sprints, and mark tickets as Resolved to earn attendance credits.
                                 </p>
@@ -305,7 +314,7 @@ const Home = () => {
                                     <span className="text-xs font-mono px-2 py-0.5 rounded bg-zinc-900 text-zinc-400 border border-zinc-800">VIEWER</span>
                                     <Clock className="w-4 h-4 text-zinc-500" />
                                 </div>
-                                <h4 className="text-base font-semibold text-white mb-2">Stakeholder / Guest</h4>
+                                <h4 className="text-base font-semibold text-white mb-2">Viewer / Guest</h4>
                                 <p className="text-xs text-zinc-400 leading-relaxed mb-4">
                                     Read-only visibility across active roadmap items, open bugs, and sprint velocity without modification rights.
                                 </p>
@@ -333,7 +342,7 @@ const Home = () => {
                             <div className="font-mono text-xs text-amber-400 mb-1">status: "open"</div>
                             <h4 className="text-sm font-semibold text-white mb-2">Admin Creates Ticket</h4>
                             <p className="text-xs text-zinc-400 leading-relaxed">
-                                Defines title, technical requirements, priority (low / medium / high), and sets an assignee.
+                                Defines title, requirements, priority (low / medium / high), and sets an assignee.
                             </p>
                         </div>
 
@@ -343,9 +352,9 @@ const Home = () => {
                                 <Clock className="w-4 h-4 text-pink-500" />
                             </div>
                             <div className="font-mono text-xs text-pink-400 mb-1">status: "in_progress"</div>
-                            <h4 className="text-sm font-semibold text-white mb-2">Engineer Takes Ownership</h4>
+                            <h4 className="text-sm font-semibold text-white mb-2">Member Starts Work</h4>
                             <p className="text-xs text-zinc-400 leading-relaxed">
-                                Member flags task as In-Progress. Socket.IO broadcasts the status change live to the team.
+                                Member flags task as In-Progress. Real-time updates notify the team instantly.
                             </p>
                         </div>
 
@@ -357,7 +366,7 @@ const Home = () => {
                             <div className="font-mono text-xs text-emerald-400 mb-1">status: "resolved"</div>
                             <h4 className="text-sm font-semibold text-white mb-2">Resolution & Credit</h4>
                             <p className="text-xs text-zinc-400 leading-relaxed">
-                                Ticket resolution computes exact turnaround duration and immediately records verifiable attendance.
+                                Ticket resolution calculates turnaround duration and automatically awards attendance.
                             </p>
                         </div>
                     </div>
